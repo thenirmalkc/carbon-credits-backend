@@ -29,6 +29,11 @@ export class CreateTokenDto {
   @IsString()
   @IsOptional()
   walletAddress?: string;
+
+  @ApiProperty({ required: true })
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
 }
 
 export class UpdateTokenDto {
@@ -50,6 +55,11 @@ export class UpdateTokenDto {
 }
 
 export class GetTokensQueryDto extends BaseQueryDto {
+  @ApiProperty({ required: true })
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
+
   @ApiProperty({ enum: TokenStatusEnum, required: false })
   @IsEnum(TokenStatusEnum)
   @IsOptional()
