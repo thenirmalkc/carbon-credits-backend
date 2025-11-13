@@ -1,17 +1,14 @@
+import Big from 'big.js';
+import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
+import { getAddress } from 'ethers';
 
 export class MintTokenDto {
+  @Transform(({ value }) => getAddress(<string>value))
   @IsString()
   toAddress: string;
 
-  @IsString()
-  amount: string = '100';
-}
-
-export class BurnToken {
-  @IsString()
-  fromAddress: string;
-
+  @Transform(({ value }) => new Big(<string>value).toFixed())
   @IsString()
   amount: string = '100';
 }

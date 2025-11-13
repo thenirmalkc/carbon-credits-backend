@@ -10,9 +10,4 @@ export class WalletController {
   mintToken(@Body() body: MintTokenDto) {
     return this.walletService.mintToken(body);
   }
-
-  @Post('burn-token')
-  burnToken(@Body() body: MintTokenDto) {
-    return this.walletService.mintToken(body);
-  }
 }
