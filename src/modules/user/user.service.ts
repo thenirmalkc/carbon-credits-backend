@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { UserDocument, UserEntity } from './entity/user.entity';
 import { RegisterDto } from './user.dto';
 import * as bcrypt from 'bcrypt';
+import { UserTypeEnum } from './user.enum';
 
 @Injectable()
 export class UserService {
