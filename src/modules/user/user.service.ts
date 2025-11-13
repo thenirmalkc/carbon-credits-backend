@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { UserDocument, UserEntity } from './entity/user.entity';
 import { RegisterDto } from './user.dto';
 import * as bcrypt from 'bcrypt';
+import { UserTypeEnum } from './user.enum';
 
 @Injectable()
 export class UserService {
@@ -63,21 +64,25 @@ export class UserService {
         name: 'Admin',
         email: 'admin@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.ADMIN,
       },
       {
         name: 'Validator',
         email: 'validator@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.VALIDATOR,
       },
       {
         name: 'Seller',
         email: 'seller@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.SELLER,
       },
       {
         name: 'Buyer',
         email: 'buyer@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.BUYER,
       },
     ];
     for (const user of users) {
