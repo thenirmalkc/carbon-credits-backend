@@ -63,21 +63,25 @@ export class UserService {
         name: 'Admin',
         email: 'admin@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.ADMIN,
       },
       {
         name: 'Validator',
         email: 'validator@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.VALIDATOR,
       },
       {
         name: 'Seller',
         email: 'seller@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.SELLER,
       },
       {
         name: 'Buyer',
         email: 'buyer@gmail.com',
         password: 'Hello@123',
+        userType: UserTypeEnum.BUYER,
       },
     ];
     for (const user of users) {
