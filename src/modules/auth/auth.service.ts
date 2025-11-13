@@ -17,25 +17,30 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await this.userService.validatePassword(password, user.password);
+    const isPasswordValid = await this.userService.validatePassword(
+      password,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const userObj = (user as any).toObject ? (user as any).toObject() : JSON.parse(JSON.stringify(user));
+    const userObj = (user as any).toObject
+      ? (user as any).toObject()
+      : JSON.parse(JSON.stringify(user));
     const { password: _, ...result } = userObj;
     return result;
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.validateUser(loginDto.email, loginDto.password);
-    
-    const payload = { 
-      email: user.email, 
+
+    const payload = {
+      email: user.email,
       userId: user._id.toString(),
-      userType: user.userType 
+      userType: user.userType,
     };
-    
+
     return {
       accessToken: this.jwtService.sign(payload),
       user: {
@@ -47,4 +52,3 @@ export class AuthService {
     };
   }
 }
-

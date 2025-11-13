@@ -15,7 +15,9 @@ import { UserModule } from '../user/user.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
+        secret:
+          configService.get<string>('JWT_SECRET') ||
+          'your-secret-key-change-in-production',
         signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],
@@ -26,4 +28,3 @@ import { UserModule } from '../user/user.module';
   exports: [AuthService],
 })
 export class AuthModule {}
-

@@ -1,0 +1,48 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "tokenAddress", "type": "address" },
+      { "internalType": "address", "name": "user", "type": "address" }
+    ],
+    "name": "getTokenInfo",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "token", "type": "address" },
+          { "internalType": "string", "name": "name", "type": "string" },
+          { "internalType": "string", "name": "symbol", "type": "string" },
+          { "internalType": "uint8", "name": "decimals", "type": "uint8" },
+          { "internalType": "uint256", "name": "balance", "type": "uint256" }
+        ],
+        "internalType": "struct UserTokenBalanceReader.TokenInfo",
+        "name": "info",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address[]", "name": "tokens", "type": "address[]" },
+      { "internalType": "address", "name": "user", "type": "address" }
+    ],
+    "name": "getTokensInfo",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "token", "type": "address" },
+          { "internalType": "string", "name": "name", "type": "string" },
+          { "internalType": "string", "name": "symbol", "type": "string" },
+          { "internalType": "uint8", "name": "decimals", "type": "uint8" },
+          { "internalType": "uint256", "name": "balance", "type": "uint256" }
+        ],
+        "internalType": "struct UserTokenBalanceReader.TokenInfo[]",
+        "name": "info",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

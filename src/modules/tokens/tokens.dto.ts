@@ -1,4 +1,10 @@
-import { IsArray, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { BaseQueryDto } from '../../common/base-query.dto';
 import { Transform, Type } from 'class-transformer';
 import { TokenStatusEnum } from './tokens.enum';
@@ -10,7 +16,11 @@ export class CreateTokenDto {
   @IsString({ each: true })
   serialNumbers: string[];
 
-  @ApiProperty({ enum: TokenStatusEnum, default: TokenStatusEnum.PENDING, required: false })
+  @ApiProperty({
+    enum: TokenStatusEnum,
+    default: TokenStatusEnum.PENDING,
+    required: false,
+  })
   @IsEnum(TokenStatusEnum)
   @IsOptional()
   status?: TokenStatusEnum;
@@ -60,4 +70,3 @@ export class GetTokensQueryDto extends BaseQueryDto {
   @IsOptional()
   walletAddress?: string;
 }
-

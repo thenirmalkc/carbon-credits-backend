@@ -3,4 +3,3 @@ export enum TokenStatusEnum {
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
 }
-

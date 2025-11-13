@@ -20,4 +20,3 @@ export class UserEntity {
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserEntity);
-
