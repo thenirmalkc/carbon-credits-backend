@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { UserService } from './modules/user/user.service';
 
 const PORT = +(process.env.PORT! || 3000);
 
@@ -18,6 +19,11 @@ async function bootstrap() {
     const documentFactory = () => SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('main/api/v1/docs', app, documentFactory);
   }
+
+  // seed users
+  const userService = app.get(UserService);
+  await userService.seedUsers();
+  console.log('Users seeded successfully');
 
   await app.listen(PORT);
   console.log(`Server: http://localhost:${PORT}`);
