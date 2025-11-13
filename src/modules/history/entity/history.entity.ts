@@ -16,8 +16,8 @@ export class HistoryEntity {
   @Prop({ type: String, enum: HistoryActionEnum, required: true })
   action: HistoryActionEnum;
 
-  @Prop({ type: String, required: true })
-  txnHash: string;
+  @Prop({ type: String, required: false })
+  txnHash: string | null;
 
   @Prop({ type: String, required: true })
   tokenName: string;

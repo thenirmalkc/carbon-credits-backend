@@ -11,7 +11,7 @@ export class HistoryService {
     private readonly historyModel: Model<HistoryDocument>,
   ) {}
 
-  createHistory(body: HistoryEntity) {
+  createHistory(body: HistoryEntity[]) {
     return this.historyModel.create(body);
   }
 
