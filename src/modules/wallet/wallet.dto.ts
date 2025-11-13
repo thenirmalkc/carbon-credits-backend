@@ -12,3 +12,5 @@ export class MintTokenDto {
   @IsString()
   amount: string = '100';
 }
+
+export class SwapUsdtDto extends MintTokenDto {}

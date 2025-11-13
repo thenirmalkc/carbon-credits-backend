@@ -6,7 +6,7 @@ import {
   InterfaceAbi,
   Transaction,
 } from 'ethers';
-import { MintTokenDto } from './wallet.dto';
+import { MintTokenDto, SwapUsdtDto } from './wallet.dto';
 import erc20abi from './erc20abi.json';
 import { HistoryService } from '../history/history.service';
 import { HistoryActionEnum } from '../history/history.enum';
@@ -57,9 +57,6 @@ export class WalletSerivce {
 
   async mintCarbonCredits(body: MintTokenDto) {
     const { toAddress, amount } = body;
-    const tokenName = (await this.carbonCreditContract.name()) as string;
-    const tokenSymbol = (await this.carbonCreditContract.symbol()) as string;
-    const tokenDecimal = (await this.carbonCreditContract.decimals()) as bigint;
     const txn = (await this.carbonCreditContract.mint(
       toAddress,
       amount,
@@ -69,19 +66,16 @@ export class WalletSerivce {
       userAddress: toAddress,
       action: HistoryActionEnum.MINT,
       txnHash: txn.hash!,
-      tokenName,
-      tokenSymbol,
-      tokenDecimal: Number(tokenDecimal.toString()),
+      tokenName: 'Carbon credit',
+      tokenSymbol: 'tCC',
+      tokenDecimal: 18,
       amount,
     });
     return txn;
   }
 
-  async mintUsdt(body: MintTokenDto) {
+  async swapUsdt(body: SwapUsdtDto) {
     const { toAddress, amount } = body;
-    const tokenName = (await this.usdtContract.name()) as string;
-    const tokenSymbol = (await this.usdtContract.symbol()) as string;
-    const tokenDecimal = (await this.usdtContract.decimals()) as bigint;
     const txn = (await this.usdtContract.mint(
       toAddress,
       amount,
@@ -89,11 +83,11 @@ export class WalletSerivce {
     await this.historyService.createHistory({
       network: NetworkEnum.SEPOLIA,
       userAddress: toAddress,
-      action: HistoryActionEnum.MINT,
+      action: HistoryActionEnum.SWAP,
       txnHash: txn.hash!,
-      tokenName,
-      tokenSymbol,
-      tokenDecimal: Number(tokenDecimal.toString()),
+      tokenName: 'tUSDt',
+      tokenSymbol: 'tUSDt',
+      tokenDecimal: 18,
       amount,
     });
     return txn;

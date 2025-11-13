@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { WalletSerivce } from './wallet.service';
-import { MintTokenDto } from './wallet.dto';
+import { MintTokenDto, SwapUsdtDto } from './wallet.dto';
 
 @Controller('wallets')
 export class WalletController {
@@ -11,8 +11,8 @@ export class WalletController {
     return this.walletService.mintCarbonCredits(body);
   }
 
-  @Post('mint-usdt')
-  mintUsdt(@Body() body: MintTokenDto) {
-    return this.walletService.mintUsdt(body);
+  @Post('swap-usdt')
+  swapUsdt(@Body() body: SwapUsdtDto) {
+    return this.walletService.swapUsdt(body);
   }
 }
