@@ -4,7 +4,7 @@ import {
   IsOptional,
   IsString,
   ValidateNested,
-  IsNotEmpty
+  IsNotEmpty,
 } from 'class-validator';
 import { BaseQueryDto } from '../../common/base-query.dto';
 import { Transform, Type } from 'class-transformer';

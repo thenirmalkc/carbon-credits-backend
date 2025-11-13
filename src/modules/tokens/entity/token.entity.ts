@@ -6,7 +6,6 @@ export type TokenDocument = HydratedDocument<TokenEntity>;
 
 @Schema({ timestamps: true, collection: 'tokens' })
 export class TokenEntity {
-
   @Prop({ type: String, required: true })
   userId: string;
 

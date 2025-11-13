@@ -8,11 +8,11 @@ import {
   getAddress,
 } from 'ethers';
 import { MintTokenDto, SwapUsdtDto } from './wallet.dto';
-import erc20Abi from './erc20abi.json';
+import erc20Abi from './erc20Abi.json';
 import { HistoryService } from '../history/history.service';
 import { HistoryActionEnum } from '../history/history.enum';
 import { NetworkEnum } from '../../common/enum';
-import balanceCheckerAbi from './balancecheckerabi.json';
+import balanceCheckerAbi from './balanceCheckerAbi.json';
 import { TokenInfoI } from './wallet.types';
 import Big from 'big.js';
 
