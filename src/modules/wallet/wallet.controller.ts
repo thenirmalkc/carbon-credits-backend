@@ -1,10 +1,19 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { WalletSerivce } from './wallet.service';
-import { MintTokenDto, SwapUsdtDto } from './wallet.dto';
+import {
+  GetWalletBalancesQueryDto,
+  MintTokenDto,
+  SwapUsdtDto,
+} from './wallet.dto';
 
 @Controller('wallets')
 export class WalletController {
   constructor(private readonly walletService: WalletSerivce) {}
+
+  @Get('balances')
+  getWalletBalances(@Query() filter: GetWalletBalancesQueryDto) {
+    return this.walletService.getWalletBalances(filter.userAddress);
+  }
 
   @Post('mint-carbon-credits')
   mintCarbonCredits(@Body() body: MintTokenDto) {

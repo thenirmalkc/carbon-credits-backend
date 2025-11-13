@@ -14,3 +14,9 @@ export class MintTokenDto {
 }
 
 export class SwapUsdtDto extends MintTokenDto {}
+
+export class GetWalletBalancesQueryDto {
+  @Transform(({ value }: { value: string }) => getAddress(value))
+  @IsString()
+  userAddress: string;
+}
