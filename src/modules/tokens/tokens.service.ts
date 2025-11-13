@@ -21,6 +21,7 @@ export class TokensService {
       count: createTokenDto.serialNumbers.length,
       status: createTokenDto.status || 'pending',
       walletAddress: createTokenDto.walletAddress || '',
+      userId: createTokenDto.userId,
     };
     return this.tokenModel.create(tokenData);
   }
