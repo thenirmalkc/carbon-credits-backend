@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { HistoryDocument, HistoryEntity } from './entity/history.entity';
-import { Model } from 'mongoose';
-import { GetHistoryQueryDto } from './history.dto';
+import { Model, Types } from 'mongoose';
+import { GetHistoryQueryDto, UpdateHistoryStatusDto } from './history.dto';
 
 @Injectable()
 export class HistoryService {
@@ -23,6 +23,9 @@ export class HistoryService {
     if (filter.action) {
       matchStage['action'] = filter.action;
     }
+    if (filter.status) {
+      matchStage['status'] = filter.status;
+    }
     const total = await this.historyModel.countDocuments(matchStage);
     const items = await this.historyModel.aggregate<HistoryEntity>([
       { $match: matchStage },
@@ -36,11 +39,20 @@ export class HistoryService {
           action: 1,
           txnHash: 1,
           amount: 1,
+          status: 1,
         },
       },
       { $skip: filter.offset },
       { $limit: filter.limit },
     ]);
     return { total, items };
+  }
+
+  async updateHistoryStatus(id: string, body: UpdateHistoryStatusDto) {
+    const updated = await this.historyModel.updateOne(
+      { _id: new Types.ObjectId(id) },
+      { $set: { status: body.status } },
+    );
+    return updated.modifiedCount;
   }
 }

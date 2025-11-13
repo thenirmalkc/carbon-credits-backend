@@ -4,3 +4,9 @@ export enum HistoryActionEnum {
   SWAP_FROM = 'SWAP_FROM',
   SWAP_TO = 'SWAP_TO',
 }
+
+export enum HistoryStatusEnum {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}

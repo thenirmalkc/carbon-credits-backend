@@ -204,7 +204,6 @@ export class WalletSerivce {
         network: NetworkEnum.SEPOLIA,
         userAddress: toAddress,
         action: HistoryActionEnum.BURN,
-        txnHash: null,
         tokenName: 'Carbon credit',
         tokenSymbol: 'tCC',
         tokenDecimal: 18,

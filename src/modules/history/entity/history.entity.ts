@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { HistoryActionEnum } from '../history.enum';
+import { HistoryActionEnum, HistoryStatusEnum } from '../history.enum';
 import { NetworkEnum } from '../../../common/enum';
 
 export type HistoryDocument = HydratedDocument<HistoryEntity>;
@@ -17,7 +17,7 @@ export class HistoryEntity {
   action: HistoryActionEnum;
 
   @Prop({ type: String, required: false })
-  txnHash: string | null;
+  txnHash?: string;
 
   @Prop({ type: String, required: true })
   tokenName: string;
@@ -30,6 +30,9 @@ export class HistoryEntity {
 
   @Prop({ type: String, required: true })
   amount: string;
+
+  @Prop({ type: String, enum: HistoryActionEnum, required: false })
+  status?: HistoryStatusEnum;
 }
 
 export const HistorySchema = SchemaFactory.createForClass(HistoryEntity);
