@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { HistoryDocument, HistoryEntity } from './entity/history.entity';
 import { Model, Types } from 'mongoose';
 import { GetHistoryQueryDto, UpdateHistoryStatusDto } from './history.dto';
+import { HistoryStatusEnum } from './history.enum';
 
 @Injectable()
 export class HistoryService {
@@ -23,7 +24,12 @@ export class HistoryService {
     if (filter.action) {
       matchStage['action'] = filter.action;
     }
-    if (filter.status) {
+    if (filter.status === HistoryStatusEnum.PENDING) {
+      matchStage.$or = [
+        { status: HistoryStatusEnum.PENDING },
+        { status: { $exists: false } },
+      ];
+    } else if (filter.status) {
       matchStage['status'] = filter.status;
     }
     const total = await this.historyModel.countDocuments(matchStage);

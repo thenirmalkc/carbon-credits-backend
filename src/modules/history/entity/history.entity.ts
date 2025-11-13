@@ -31,7 +31,12 @@ export class HistoryEntity {
   @Prop({ type: String, required: true })
   amount: string;
 
-  @Prop({ type: String, enum: HistoryActionEnum, required: false })
+  @Prop({
+    type: String,
+    enum: HistoryStatusEnum,
+    required: false,
+    default: HistoryStatusEnum.PENDING,
+  })
   status?: HistoryStatusEnum;
 }
 
