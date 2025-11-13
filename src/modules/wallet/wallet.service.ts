@@ -199,7 +199,7 @@ export class WalletSerivce {
 
   async burnCarbonCredits(body: BurnCarbonCreditsDto) {
     const { toAddress, amount } = body;
-    await this.historyService.createHistory([
+    return this.historyService.createHistory([
       {
         network: NetworkEnum.SEPOLIA,
         userAddress: toAddress,
