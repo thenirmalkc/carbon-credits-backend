@@ -16,9 +16,10 @@ export class HistoryService {
   }
 
   async getHistory(filter: GetHistoryQueryDto) {
-    const matchStage: Record<string, any> = {
-      userAddress: filter.userAddress,
-    };
+    const matchStage: Record<string, any> = {};
+    if (filter.userAddress) {
+      matchStage['userAddress'] = filter.userAddress;
+    }
     if (filter.action) {
       matchStage['action'] = filter.action;
     }
