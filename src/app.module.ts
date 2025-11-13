@@ -14,9 +14,11 @@ import { AllExceptionFilter } from './common/all-exception.filter';
 import { HistoryModule } from './modules/history/history.module';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { CorsMiddleware } from './common/cors.middleware';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
-  imports: [ConfigModule, CertificateModule, WalletModule, HistoryModule, TokensModule],
+  imports: [ConfigModule, CertificateModule, WalletModule, HistoryModule, TokensModule, UserModule, AuthModule],
   controllers: [AppController],
   providers: [
     AppService,
