@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Put,
   Delete,
   Query,
   HttpCode,
@@ -42,7 +43,7 @@ export class TokensController {
     return this.tokensService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({ summary: 'Update a token' })
   @ApiResponse({ status: 200, description: 'Token updated successfully' })
   @ApiResponse({ status: 404, description: 'Token not found' })
