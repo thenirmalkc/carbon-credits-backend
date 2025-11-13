@@ -32,6 +32,10 @@ export class TokensService {
       matchStage['walletAddress'] = filter.walletAddress;
     }
 
+    if (filter.userId) {
+      matchStage['userId'] = filter.userId;
+    }
+
     const total = await this.tokenModel.countDocuments(matchStage);
     const items = await this.tokenModel.aggregate<TokenEntity>([
       { $match: matchStage },
