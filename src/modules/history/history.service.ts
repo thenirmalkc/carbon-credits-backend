@@ -16,11 +16,15 @@ export class HistoryService {
   }
 
   async getHistory(filter: GetHistoryQueryDto) {
-    const total = await this.historyModel.countDocuments({
+    const matchStage: Record<string, any> = {
       userAddress: filter.userAddress,
-    });
+    };
+    if (filter.action) {
+      matchStage['action'] = filter.action;
+    }
+    const total = await this.historyModel.countDocuments(matchStage);
     const items = await this.historyModel.aggregate<HistoryEntity>([
-      { $match: { userAddress: filter.userAddress } },
+      { $match: matchStage },
       { $sort: { [filter.sortBy]: filter.order } },
       {
         $project: {

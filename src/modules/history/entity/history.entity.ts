@@ -20,6 +20,15 @@ export class HistoryEntity {
   txnHash: string;
 
   @Prop({ type: String, required: true })
+  tokenName: string;
+
+  @Prop({ type: String, required: true })
+  tokenSymbol: string;
+
+  @Prop({ type: Number, required: true })
+  tokenDecimal: number;
+
+  @Prop({ type: String, required: true })
   amount: string;
 }
 

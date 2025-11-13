@@ -6,8 +6,13 @@ import { MintTokenDto } from './wallet.dto';
 export class WalletController {
   constructor(private readonly walletService: WalletSerivce) {}
 
-  @Post('mint-token')
-  mintToken(@Body() body: MintTokenDto) {
-    return this.walletService.mintToken(body);
+  @Post('mint-carbon-credits')
+  mintCarbonCredits(@Body() body: MintTokenDto) {
+    return this.walletService.mintCarbonCredits(body);
+  }
+
+  @Post('mint-usdt')
+  mintUsdt(@Body() body: MintTokenDto) {
+    return this.walletService.mintUsdt(body);
   }
 }

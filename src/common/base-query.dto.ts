@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsInt, IsNumber, Max, Min } from 'class-validator';
 
@@ -10,6 +11,8 @@ export enum OrderEnum {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+type OrderType = 1 | -1;
 
 export class BaseQueryDto {
   @IsInt()
@@ -26,9 +29,10 @@ export class BaseQueryDto {
   @IsEnum(SortByEnum)
   sortBy: SortByEnum = SortByEnum.CREATED_AT;
 
+  @ApiProperty({ type: 'string', enum: OrderEnum, default: OrderEnum.DESC })
   @Transform(({ value }: { value: OrderEnum }) =>
     value === OrderEnum.ASC ? 1 : -1,
   )
   @IsNumber()
-  order: 1 | -1 = OrderEnum.DESC as unknown as 1 | -1;
+  order: OrderType;
 }
