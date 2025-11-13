@@ -56,10 +56,10 @@ export class UpdateTokenDto {
 }
 
 export class GetTokensQueryDto extends BaseQueryDto {
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  userId: string;
+  userId?: string;
 
   @ApiProperty({ enum: TokenStatusEnum, required: false })
   @IsEnum(TokenStatusEnum)
