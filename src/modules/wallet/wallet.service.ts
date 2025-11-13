@@ -7,7 +7,7 @@ import {
   Transaction,
   getAddress,
 } from 'ethers';
-import { MintTokenDto, SwapUsdtDto } from './wallet.dto';
+import { BurnCarbonCreditsDto, MintTokenDto, SwapUsdtDto } from './wallet.dto';
 import erc20Abi from './erc20Abi.json';
 import { HistoryService } from '../history/history.service';
 import { HistoryActionEnum } from '../history/history.enum';
@@ -99,35 +99,117 @@ export class WalletSerivce {
       toAddress,
       amount,
     )) as Transaction;
-    await this.historyService.createHistory({
-      network: NetworkEnum.SEPOLIA,
-      userAddress: toAddress,
-      action: HistoryActionEnum.MINT,
-      txnHash: txn.hash!,
-      tokenName: 'Carbon credit',
-      tokenSymbol: 'tCC',
-      tokenDecimal: 18,
-      amount,
-    });
+    await this.historyService.createHistory([
+      {
+        network: NetworkEnum.SEPOLIA,
+        userAddress: toAddress,
+        action: HistoryActionEnum.MINT,
+        txnHash: txn.hash!,
+        tokenName: 'Carbon credit',
+        tokenSymbol: 'tCC',
+        tokenDecimal: 18,
+        amount,
+      },
+    ]);
     return txn;
   }
 
-  async swapUsdt(body: SwapUsdtDto) {
+  async mintUsdt(body: MintTokenDto) {
     const { toAddress, amount } = body;
     const txn = (await this.usdtContract.mint(
       toAddress,
       amount,
     )) as Transaction;
-    await this.historyService.createHistory({
-      network: NetworkEnum.SEPOLIA,
-      userAddress: toAddress,
-      action: HistoryActionEnum.SWAP,
-      txnHash: txn.hash!,
-      tokenName: 'tUSDt',
-      tokenSymbol: 'tUSDt',
-      tokenDecimal: 18,
-      amount,
-    });
+    await this.historyService.createHistory([
+      {
+        network: NetworkEnum.SEPOLIA,
+        userAddress: toAddress,
+        action: HistoryActionEnum.MINT,
+        txnHash: txn.hash!,
+        tokenName: 'tUSDt',
+        tokenSymbol: 'tUSDt',
+        tokenDecimal: 18,
+        amount,
+      },
+    ]);
     return txn;
+  }
+
+  async swapCarbonCredits(body: SwapUsdtDto) {
+    const { toAddress, amount, swapAmount } = body;
+    const txn = (await this.usdtContract.mint(
+      toAddress,
+      amount,
+    )) as Transaction;
+    await this.historyService.createHistory([
+      {
+        network: NetworkEnum.SEPOLIA,
+        userAddress: toAddress,
+        action: HistoryActionEnum.SWAP_FROM,
+        txnHash: txn.hash!,
+        tokenName: 'tUSDt',
+        tokenSymbol: 'tUSDt',
+        tokenDecimal: 18,
+        amount: swapAmount,
+      },
+      {
+        network: NetworkEnum.SEPOLIA,
+        userAddress: toAddress,
+        action: HistoryActionEnum.SWAP_TO,
+        txnHash: txn.hash!,
+        tokenName: 'Carbon credit',
+        tokenSymbol: 'tCC',
+        tokenDecimal: 18,
+        amount,
+      },
+    ]);
+    return txn;
+  }
+
+  async swapUsdt(body: SwapUsdtDto) {
+    const { toAddress, amount, swapAmount } = body;
+    const txn = (await this.usdtContract.mint(
+      toAddress,
+      amount,
+    )) as Transaction;
+    await this.historyService.createHistory([
+      {
+        network: NetworkEnum.SEPOLIA,
+        userAddress: toAddress,
+        action: HistoryActionEnum.SWAP_FROM,
+        txnHash: txn.hash!,
+        tokenName: 'Carbon credit',
+        tokenSymbol: 'tCC',
+        tokenDecimal: 18,
+        amount: swapAmount,
+      },
+      {
+        network: NetworkEnum.SEPOLIA,
+        userAddress: toAddress,
+        action: HistoryActionEnum.SWAP_TO,
+        txnHash: txn.hash!,
+        tokenName: 'tUSDt',
+        tokenSymbol: 'tUSDt',
+        tokenDecimal: 18,
+        amount,
+      },
+    ]);
+    return txn;
+  }
+
+  async burnCarbonCredits(body: BurnCarbonCreditsDto) {
+    const { toAddress, amount } = body;
+    return this.historyService.createHistory([
+      {
+        network: NetworkEnum.SEPOLIA,
+        userAddress: toAddress,
+        action: HistoryActionEnum.BURN,
+        txnHash: null,
+        tokenName: 'Carbon credit',
+        tokenSymbol: 'tCC',
+        tokenDecimal: 18,
+        amount: amount,
+      },
+    ]);
   }
 }

@@ -7,7 +7,8 @@ import { HistoryActionEnum } from './history.enum';
 export class GetHistoryQueryDto extends BaseQueryDto {
   @Transform(({ value }) => getAddress(<string>value))
   @IsString()
-  userAddress: string;
+  @IsOptional()
+  userAddress?: string;
 
   @IsEnum(HistoryActionEnum)
   @IsOptional()

@@ -13,7 +13,19 @@ export class MintTokenDto {
   amount: string = '100';
 }
 
-export class SwapUsdtDto extends MintTokenDto {}
+export class SwapCarbonCreditsDto extends MintTokenDto {
+  @Transform(({ value }) => new Big(<string>value).toFixed())
+  @IsString()
+  swapAmount: string = '100';
+}
+
+export class SwapUsdtDto extends MintTokenDto {
+  @Transform(({ value }) => new Big(<string>value).toFixed())
+  @IsString()
+  swapAmount: string = '100';
+}
+
+export class BurnCarbonCreditsDto extends MintTokenDto {}
 
 export class GetWalletBalancesQueryDto {
   @Transform(({ value }: { value: string }) => getAddress(value))
