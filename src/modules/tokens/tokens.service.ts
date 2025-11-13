@@ -2,7 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { TokenDocument, TokenEntity } from './entity/token.entity';
 import { Model } from 'mongoose';
-import { CreateTokenDto, GetTokensQueryDto, UpdateTokenDto } from './tokens.dto';
+import {
+  CreateTokenDto,
+  GetTokensQueryDto,
+  UpdateTokenDto,
+} from './tokens.dto';
 
 @Injectable()
 export class TokensService {
@@ -23,11 +27,11 @@ export class TokensService {
 
   async findAll(filter: GetTokensQueryDto) {
     const matchStage: Record<string, any> = {};
-    
+
     if (filter.status) {
       matchStage['status'] = filter.status;
     }
-    
+
     if (filter.walletAddress) {
       matchStage['walletAddress'] = filter.walletAddress;
     }
@@ -50,7 +54,7 @@ export class TokensService {
       { $skip: filter.offset },
       { $limit: filter.limit },
     ]);
-    
+
     return { total, items };
   }
 
@@ -62,18 +66,21 @@ export class TokensService {
     return token;
   }
 
-  async update(id: string, updateTokenDto: UpdateTokenDto): Promise<TokenEntity> {
+  async update(
+    id: string,
+    updateTokenDto: UpdateTokenDto,
+  ): Promise<TokenEntity> {
     const updateData: any = {};
-    
+
     if (updateTokenDto.serialNumbers !== undefined) {
       updateData.serialNumbers = updateTokenDto.serialNumbers;
       updateData.count = updateTokenDto.serialNumbers.length;
     }
-    
+
     if (updateTokenDto.status !== undefined) {
       updateData.status = updateTokenDto.status;
     }
-    
+
     if (updateTokenDto.walletAddress !== undefined) {
       updateData.walletAddress = updateTokenDto.walletAddress;
     }
@@ -81,11 +88,11 @@ export class TokensService {
     const updatedToken = await this.tokenModel
       .findByIdAndUpdate(id, updateData, { new: true })
       .exec();
-    
+
     if (!updatedToken) {
       throw new NotFoundException(`Token with ID ${id} not found`);
     }
-    
+
     return updatedToken;
   }
 
@@ -96,4 +103,3 @@ export class TokensService {
     }
   }
 }
-

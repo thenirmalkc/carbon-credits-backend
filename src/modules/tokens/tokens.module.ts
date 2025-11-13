@@ -15,4 +15,3 @@ import { TokenEntity, TokenSchema } from './entity/token.entity';
   exports: [TokensService],
 })
 export class TokensModule {}
-

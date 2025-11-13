@@ -18,7 +18,15 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
-  imports: [ConfigModule, CertificateModule, WalletModule, HistoryModule, TokensModule, UserModule, AuthModule],
+  imports: [
+    ConfigModule,
+    CertificateModule,
+    WalletModule,
+    HistoryModule,
+    TokensModule,
+    UserModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

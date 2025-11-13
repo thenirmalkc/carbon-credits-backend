@@ -12,7 +12,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { TokensService } from './tokens.service';
-import { CreateTokenDto, UpdateTokenDto, GetTokensQueryDto } from './tokens.dto';
+import {
+  CreateTokenDto,
+  UpdateTokenDto,
+  GetTokensQueryDto,
+} from './tokens.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('tokens')
@@ -60,4 +64,3 @@ export class TokensController {
     return this.tokensService.remove(id);
   }
 }
-

@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserDocument, UserEntity } from './entity/user.entity';
@@ -14,7 +18,9 @@ export class UserService {
 
   async create(registerDto: RegisterDto): Promise<UserEntity> {
     // Check if user already exists
-    const existingUser = await this.userModel.findOne({ email: registerDto.email }).exec();
+    const existingUser = await this.userModel
+      .findOne({ email: registerDto.email })
+      .exec();
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
@@ -44,7 +50,10 @@ export class UserService {
     return user;
   }
 
-  async validatePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+  async validatePassword(
+    plainPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
@@ -72,7 +81,9 @@ export class UserService {
       },
     ];
     for (const user of users) {
-      const existingUser = await this.userModel.findOne({ email: user.email }).exec();
+      const existingUser = await this.userModel
+        .findOne({ email: user.email })
+        .exec();
       if (!existingUser) {
         const hashedPassword = await bcrypt.hash(user.password, 10);
         await this.userModel.create({ ...user, password: hashedPassword });
@@ -80,4 +91,3 @@ export class UserService {
     }
   }
 }
-

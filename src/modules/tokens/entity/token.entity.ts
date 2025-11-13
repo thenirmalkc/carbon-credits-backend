@@ -12,7 +12,11 @@ export class TokenEntity {
   @Prop({ type: Number, required: true })
   count: number;
 
-  @Prop({ type: String, enum: TokenStatusEnum, default: TokenStatusEnum.PENDING })
+  @Prop({
+    type: String,
+    enum: TokenStatusEnum,
+    default: TokenStatusEnum.PENDING,
+  })
   status: TokenStatusEnum;
 
   @Prop({ type: String, default: '' })
@@ -20,4 +24,3 @@ export class TokenEntity {
 }
 
 export const TokenSchema = SchemaFactory.createForClass(TokenEntity);
-
