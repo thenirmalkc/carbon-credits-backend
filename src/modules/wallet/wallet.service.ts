@@ -137,9 +137,9 @@ export class WalletSerivce {
 
   async swapCarbonCredits(body: SwapUsdtDto) {
     const { toAddress, amount, swapAmount } = body;
-    const txn = (await this.usdtContract.mint(
+    const txn = (await this.carbonCreditContract.mint(
       toAddress,
-      amount,
+      swapAmount,
     )) as Transaction;
     await this.historyService.createHistory([
       {
@@ -150,7 +150,7 @@ export class WalletSerivce {
         tokenName: 'Tether USD',
         tokenSymbol: 'USDT',
         tokenDecimal: 18,
-        amount: swapAmount,
+        amount,
       },
       {
         network: NetworkEnum.SEPOLIA,
@@ -160,7 +160,7 @@ export class WalletSerivce {
         tokenName: 'EcoChain Token',
         tokenSymbol: 'ECT',
         tokenDecimal: 18,
-        amount,
+        amount: swapAmount,
       },
     ]);
     return txn;
@@ -170,7 +170,7 @@ export class WalletSerivce {
     const { toAddress, amount, swapAmount } = body;
     const txn = (await this.usdtContract.mint(
       toAddress,
-      amount,
+      swapAmount,
     )) as Transaction;
     await this.historyService.createHistory([
       {
@@ -181,7 +181,7 @@ export class WalletSerivce {
         tokenName: 'EcoChain Token',
         tokenSymbol: 'ECT',
         tokenDecimal: 18,
-        amount: swapAmount,
+        amount,
       },
       {
         network: NetworkEnum.SEPOLIA,
@@ -191,7 +191,7 @@ export class WalletSerivce {
         tokenName: 'Tether USD',
         tokenSymbol: 'USDT',
         tokenDecimal: 18,
-        amount,
+        amount: swapAmount,
       },
     ]);
     return txn;
