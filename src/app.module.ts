@@ -16,6 +16,8 @@ import { TokensModule } from './modules/tokens/tokens.module';
 import { CorsMiddleware } from './common/cors.middleware';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProjectModule } from './modules/project/project.module';
+import { FileUploadModule } from './modules/file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { AuthModule } from './modules/auth/auth.module';
     TokensModule,
     UserModule,
     AuthModule,
+    ProjectModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [
