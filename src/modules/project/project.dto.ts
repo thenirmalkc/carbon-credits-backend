@@ -1,3 +1,3 @@
-import { TverPddEntity } from './entity/tver-pdd.entity';
+import { TverProjectEntity } from './entity/tver-project.entity';
 
-export class CreateTVerPddIn extends TverPddEntity {}
+export class CreateTverProjectIn extends TverProjectEntity {}

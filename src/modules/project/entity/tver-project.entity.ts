@@ -17,6 +17,7 @@ import {
   TverProjectModelEnum,
   TverProjectSizeEnum,
 } from '../project.enum';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 @Schema({ _id: false })
 export class ProjectParticipantEntity {
@@ -79,7 +80,7 @@ export const ReporterDetailSchema =
   SchemaFactory.createForClass(ReporterDetailEntity);
 
 @Schema({ _id: false })
-export class TverPddDocsEntity {
+export class TverProjectDocsEntity {
   @IsString()
   @Prop()
   filePath: string;
@@ -89,12 +90,13 @@ export class TverPddDocsEntity {
   documentType: string;
 }
 
-export type TverPddDocsDocument = HydratedDocument<TverPddDocsEntity>;
-export const TverPddDocsSchema =
-  SchemaFactory.createForClass(TverPddDocsEntity);
+export type TverProjectDocsDocument = HydratedDocument<TverProjectDocsEntity>;
+export const TverProjectDocsSchema = SchemaFactory.createForClass(
+  TverProjectDocsEntity,
+);
 
-@Schema({ timestamps: true, collection: 'tver_pdd' })
-export class TverPddEntity {
+@Schema({ timestamps: true, collection: 'tver_project' })
+export class TverProjectEntity {
   // --- Project Details ---
   @IsString()
   @Prop()
@@ -221,10 +223,15 @@ export class TverPddEntity {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => TverPddDocsEntity)
+  @Type(() => TverProjectDocsEntity)
   @Prop({ default: [] })
-  docs?: TverPddDocsEntity[];
+  docs?: TverProjectDocsEntity[];
+
+  @ApiHideProperty()
+  @Prop()
+  pddTemplate?: string;
 }
 
-export type TverPddDocument = HydratedDocument<TverPddEntity>;
-export const TverPddSchema = SchemaFactory.createForClass(TverPddEntity);
+export type TverProjectDocument = HydratedDocument<TverProjectEntity>;
+export const TverProjectSchema =
+  SchemaFactory.createForClass(TverProjectEntity);
