@@ -6,7 +6,7 @@ import {
   ProjectDocumentsDocument,
   ProjectDocumentsEntity,
 } from './entity/project-document.entity';
-import { CreateTverProjectIn } from './project.dto';
+import { CreateTverProjectIn, GetProjectsQuery } from './project.dto';
 import { FileUploadService } from '../file-upload/file-upload.service';
 
 @Injectable()
@@ -37,7 +37,12 @@ export class ProjectService {
 
   async getProject(id: string) {
     const projects = await this.projectModel.aggregate<ProjectEntity>([
-      { $match: { _id: new Types.ObjectId(id) } },
+      {
+        $match: {
+          _id: new Types.ObjectId(id),
+          deletedAt: { $exists: false },
+        },
+      },
       {
         $lookup: {
           from: 'project_documents',
@@ -91,5 +96,48 @@ export class ProjectService {
     if (!projects.length) return null;
     await this.fileUploadService.populateUrls(projects, ['filePath']);
     return projects[0];
+  }
+
+  async getProjects(filter: GetProjectsQuery) {
+    const matchStage: Record<string, any> = {
+      deletedAt: { $exists: false },
+    };
+    if (filter.projectType) {
+      matchStage['projectType'] = filter.projectType;
+    }
+    if (filter.projectStandard) {
+      matchStage['projectStandard'] = filter.projectStandard;
+    }
+    const result = await this.projectModel.aggregate<ProjectEntity>([
+      {
+        $facet: {
+          total: [{ $match: matchStage }, { $count: 'total' }],
+          items: [
+            { $match: matchStage },
+            { $sort: { [filter.sortBy]: filter.order } },
+            { $limit: filter.limit },
+            { $skip: filter.offset },
+            {
+              $project: {
+                _id: 1,
+                projectType: 1,
+                projectStandard: 1,
+                projectTitle: 1,
+                carbonCredits: 1,
+                projectOwners: 1,
+                locations: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          total: { $ifNull: [{ $arrayElemAt: ['$total.total', 0] }, 0] },
+        },
+      },
+      { $project: { total: 1, items: 1 } },
+    ]);
+    return result;
   }
 }

@@ -5,12 +5,13 @@ import {
   HttpException,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CreateTverProjectIn } from './project.dto';
+import { CreateTverProjectIn, GetProjectsQuery } from './project.dto';
 
 @ApiTags('Project')
 @ApiBearerAuth()
@@ -19,10 +20,15 @@ import { CreateTverProjectIn } from './project.dto';
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
+  @Get()
+  getProjects(@Query() filter: GetProjectsQuery) {
+    return this.projectService.getProjects(filter);
+  }
+
   @Post('tver')
   async createTverProject(@Body() body: CreateTverProjectIn) {
     const projectId = await this.projectService.createTverProject(body);
-    return projectId.toString();
+    return this.getProject(projectId.toString());
   }
 
   @Get(':id')
