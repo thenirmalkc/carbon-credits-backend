@@ -1,0 +1,17 @@
+export const TVER_PROJECT_TYPES = [
+  'Renewable energy of fossil fuel replacement',
+  'Improvement of the efficiency of electricity and heat generation',
+  'Use of public transportation system',
+  'Use of electric vehicle',
+  'Improvement of the efficiency of engine',
+  'Improvement of the efficiency of energy consumption in building and factory and in household',
+  'Use of natural refrigerant',
+  'Use of clinker substitute',
+  'Solid waste management',
+  'Domestic wastewater management',
+  'Methane recovery and utilization',
+  'Industrial wastewater management',
+  'Reduction, absorption and removal of greenhouse gases from the forestry and agriculture sectors',
+  'Capture, storage, and/or utilization of greenhouse gas',
+  'Other',
+];
