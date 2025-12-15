@@ -1,6 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 import { ProjectEntity } from './entity/project.entity';
-import { ProjectDocumentEntity } from './entity/project-document.entity';
+import { ProjectDocumentsEntity } from './entity/project-document.entity';
 import { IsArray, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -21,9 +21,10 @@ export class CreateTverProjectIn extends PickType(ProjectEntity, [
   documents?: CreateProjectDocumentIn[];
 }
 
-export class CreateProjectDocumentIn extends PickType(ProjectDocumentEntity, [
+export class CreateProjectDocumentIn extends PickType(ProjectDocumentsEntity, [
   'filePath',
   'filePath',
   'userDescription',
+  'projectId',
   'createdById',
 ] as const) {}

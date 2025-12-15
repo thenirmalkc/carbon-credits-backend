@@ -15,9 +15,9 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { ProjectDocumentEntity } from './project-document.entity';
 import { Type } from 'class-transformer';
 import { TverProjectEntity } from './tver-project.entity';
+import { ProjectDocumentsEntity } from './project-document.entity';
 
 @Schema({ _id: false })
 class ProjectOwnerEntity {
@@ -143,7 +143,7 @@ export class ProjectEntity extends CommonBaseEntity {
   updatedById?: Types.ObjectId;
 
   // relations
-  documents: ProjectDocumentEntity[];
+  documents: ProjectDocumentsEntity[];
 }
 
 export type ProjectDocument = HydratedDocument<ProjectEntity>;

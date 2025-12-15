@@ -6,7 +6,7 @@ import { CommonBaseEntity } from '../../../common/entities/common-base.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
 
 @Schema({ timestamps: true, collection: 'project_documents' })
-export class ProjectDocumentEntity extends CommonBaseEntity {
+export class ProjectDocumentsEntity extends CommonBaseEntity {
   @IsString()
   @Prop()
   filePath: string;
@@ -47,7 +47,7 @@ export class ProjectDocumentEntity extends CommonBaseEntity {
   updatedById?: Types.ObjectId;
 }
 
-export type ProjectDocument = HydratedDocument<ProjectDocumentEntity>;
-export const ProjectDocumentSchema = SchemaFactory.createForClass(
-  ProjectDocumentEntity,
+export type ProjectDocumentsDocument = HydratedDocument<ProjectDocumentsEntity>;
+export const ProjectDocumentsSchema = SchemaFactory.createForClass(
+  ProjectDocumentsEntity,
 );

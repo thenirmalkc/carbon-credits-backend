@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,6 +23,15 @@ export class ProjectController {
   async createTverProject(@Body() body: CreateTverProjectIn) {
     const projectId = await this.projectService.createTverProject(body);
     return projectId.toString();
+  }
+
+  @Get(':id')
+  async getProject(@Param('id') id: string) {
+    const project = await this.projectService.getProject(id);
+    if (!project) {
+      throw new HttpException('Project not found', 404);
+    }
+    return project;
   }
 
   // @Get('tver-projects')

@@ -34,7 +34,8 @@ export class HttpInterceptor implements NestInterceptor {
         return {
           status,
           statusCode,
-          data: instanceToPlain(value),
+          // data: instanceToPlain(value),
+          data: value,
           timestamp: Date.now() / 1000,
         };
       }),

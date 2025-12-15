@@ -58,7 +58,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       errName = exception.name;
       message = exception.message;
     }
-
+    console.log(exception, 'exception....');
     res.status(statusCode).json({
       status: false,
       statusCode,
