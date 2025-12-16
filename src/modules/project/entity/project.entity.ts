@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CommonBaseEntity } from '../../../common/entities/common-base.entity';
 import { HydratedDocument, Types } from 'mongoose';
-import { ProjectStandardEnum, ProjectTypeEnum } from '../project.enum';
+import {
+  ProjectStandardEnum,
+  ProjectTypeEnum,
+  ProjectVerificationStatusEnum,
+} from '../project.enum';
 import {
   Allow,
   ArrayMaxSize,
@@ -116,6 +120,11 @@ export class ProjectEntity extends CommonBaseEntity {
 
   @Prop()
   verifiedById: Types.ObjectId;
+
+  @ApiHideProperty()
+  @IsEnum(ProjectVerificationStatusEnum)
+  @Prop({ default: ProjectVerificationStatusEnum.PENDING })
+  verificationStatus: ProjectVerificationStatusEnum;
 
   @Type(() => ProjectOwnerEntity)
   @IsArray()

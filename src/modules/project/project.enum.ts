@@ -9,6 +9,12 @@ export enum ProjectStandardEnum {
   VERRA = 'VERRA', // Global standard
 }
 
+export enum ProjectVerificationStatusEnum {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
+
 export enum PorjectFileTypeEnum {
   PDF = 'PDF',
 }
