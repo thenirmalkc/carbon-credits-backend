@@ -1,7 +1,13 @@
 import { PartialType, PickType } from '@nestjs/swagger';
 import { ProjectEntity } from './entity/project.entity';
 import { ProjectDocumentsEntity } from './entity/project-document.entity';
-import { IsArray, IsEnum, IsOptional, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { BaseQueryDto } from 'src/common/dtos/base-query.dto';
 import { ProjectStandardEnum, ProjectTypeEnum } from './project.enum';
@@ -39,6 +45,10 @@ export class GetProjectsQuery extends BaseQueryDto {
   @IsEnum(ProjectStandardEnum)
   @IsOptional()
   projectStandard?: ProjectStandardEnum;
+
+  @IsString()
+  @IsOptional()
+  search?: string;
 }
 
 export class UpdateProjectIn extends PartialType(

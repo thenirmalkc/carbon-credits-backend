@@ -9,6 +9,7 @@ import {
   ProjectDocumentsSchema,
 } from './entity/project-document.entity';
 import { FileUploadModule } from '../file-upload/file-upload.module';
+import { OpenaiService } from 'src/common/services/openai.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { FileUploadModule } from '../file-upload/file-upload.module';
     FileUploadModule,
   ],
   controllers: [ProjectController],
-  providers: [ProjectService],
+  providers: [ProjectService, OpenaiService],
 })
 export class ProjectModule {}

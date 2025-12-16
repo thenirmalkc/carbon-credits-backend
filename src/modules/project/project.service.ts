@@ -15,6 +15,7 @@ import {
 import { FileUploadService } from '../file-upload/file-upload.service';
 import fs from 'fs';
 import path from 'path';
+import { OpenaiService } from 'src/common/services/openai.service';
 
 @Injectable()
 export class ProjectService {
@@ -27,6 +28,7 @@ export class ProjectService {
     @InjectModel(ProjectDocumentsEntity.name)
     private readonly projectDocumentsModel: Model<ProjectDocumentsDocument>,
     private readonly fileUploadService: FileUploadService,
+    private readonly openaiService: OpenaiService,
   ) {
     this.tverTemplate = fs
       .readFileSync(path.join(__dirname, '../../templates/tver-template.html'))
@@ -173,8 +175,8 @@ export class ProjectService {
           items: [
             { $match: matchStage },
             { $sort: { [filter.sortBy]: filter.order } },
-            { $limit: filter.limit },
             { $skip: filter.offset },
+            { $limit: filter.limit },
             {
               $project: {
                 _id: 1,
@@ -238,5 +240,10 @@ export class ProjectService {
       throw new HttpException('Project not found', 404);
     }
     return { pddTemplate: this.tverTemplate };
+  }
+
+  formatHtmlByAi(html: string) {
+    const prompt = ``;
+    return html;
   }
 }

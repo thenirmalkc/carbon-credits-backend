@@ -52,6 +52,8 @@ export class AllExceptionFilter implements ExceptionFilter {
         statusCode = 409;
         const field = exception.message.split('#')[1].split(' ')[0];
         message = `${field} already exists`;
+      } else {
+        message = exception.message;
       }
     } else if (exception instanceof Error) {
       statusCode = 500;

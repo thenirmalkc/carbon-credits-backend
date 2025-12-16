@@ -159,3 +159,5 @@ export class ProjectEntity extends CommonBaseEntity {
 
 export type ProjectDocument = HydratedDocument<ProjectEntity>;
 export const ProjectSchema = SchemaFactory.createForClass(ProjectEntity);
+
+ProjectSchema.index({ projectTitle: 'text' }, { weights: { projectTitle: 1 } });
