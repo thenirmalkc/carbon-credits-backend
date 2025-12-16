@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ProjectDocument, ProjectEntity } from './entity/project.entity';
 import { Connection, Model, Types } from 'mongoose';
@@ -13,9 +13,13 @@ import {
   UpdateProjectIn,
 } from './project.dto';
 import { FileUploadService } from '../file-upload/file-upload.service';
+import fs from 'fs';
+import path from 'path';
 
 @Injectable()
 export class ProjectService {
+  private readonly tverTemplate: string;
+
   constructor(
     @InjectConnection() private readonly mongoConn: Connection,
     @InjectModel(ProjectEntity.name)
@@ -23,7 +27,11 @@ export class ProjectService {
     @InjectModel(ProjectDocumentsEntity.name)
     private readonly projectDocumentsModel: Model<ProjectDocumentsDocument>,
     private readonly fileUploadService: FileUploadService,
-  ) {}
+  ) {
+    this.tverTemplate = fs
+      .readFileSync(path.join(__dirname, '../../templates/tver-template.html'))
+      .toString();
+  }
 
   async createTverProject(body: CreateTverProjectIn) {
     const session = await this.mongoConn.startSession();
@@ -222,5 +230,13 @@ export class ProjectService {
       { $set: body },
     );
     return updated.matchedCount;
+  }
+
+  async generatePddTemplate(id: string) {
+    const project = await this.getPddTemplate(id);
+    if (!project) {
+      throw new HttpException('Project not found', 404);
+    }
+    return { pddTemplate: this.tverTemplate };
   }
 }

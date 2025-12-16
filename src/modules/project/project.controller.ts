@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -18,6 +19,8 @@ import {
   UpdatePddTemplateIn,
   UpdateProjectIn,
 } from './project.dto';
+import htmlToDocx from '@turbodocx/html-to-docx';
+import { Response } from 'express';
 
 @ApiTags('Project')
 @ApiBearerAuth()
@@ -75,5 +78,24 @@ export class ProjectController {
       throw new HttpException('Failed to update', 400);
     }
     return updated;
+  }
+
+  @Post(':id/generate')
+  async generatePddTemplate(@Param('id') id: string, @Res() res: Response) {
+    const { pddTemplate } = await this.projectService.generatePddTemplate(id);
+    // convert to buffer
+    let buffer = await htmlToDocx(pddTemplate);
+    if (buffer instanceof ArrayBuffer) {
+      buffer = Buffer.from(buffer);
+    } else if (buffer instanceof Blob) {
+      buffer = Buffer.from(await buffer.arrayBuffer());
+    }
+    res.set({
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': 'attachment; filename="pdd.docx"',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
   }
 }
