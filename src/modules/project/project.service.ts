@@ -9,6 +9,7 @@ import {
 import {
   CreateTverProjectIn,
   GetProjectsQuery,
+  UpdatePddTemplateIn,
   UpdateProjectIn,
 } from './project.dto';
 import { FileUploadService } from '../file-upload/file-upload.service';
@@ -33,7 +34,10 @@ export class ProjectService {
         body.documents.forEach((doc) => {
           doc.projectId = projectId;
         });
-        await this.projectDocumentsModel.create(body.documents, { session });
+        await this.projectDocumentsModel.create(body.documents, {
+          session,
+          ordered: true,
+        });
       }
       return projectId;
     });
@@ -185,5 +189,35 @@ export class ProjectService {
       { $project: { total: 1, items: 1 } },
     ]);
     return result[0];
+  }
+
+  async getPddTemplate(id: string) {
+    const projects = await this.projectModel.aggregate<ProjectEntity>([
+      {
+        $match: {
+          _id: new Types.ObjectId(id),
+          deletedAt: { $exists: false },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          pddTemplate: 1,
+        },
+      },
+    ]);
+    if (!projects.length) return null;
+    return projects[0];
+  }
+
+  async updatePddTemplate(id: string, body: UpdatePddTemplateIn) {
+    const updated = await this.projectModel.updateOne(
+      {
+        _id: new Types.ObjectId(id),
+        deletedAt: { $exists: false },
+      },
+      { $set: body },
+    );
+    return updated.matchedCount;
   }
 }

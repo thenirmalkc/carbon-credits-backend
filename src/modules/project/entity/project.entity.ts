@@ -107,6 +107,7 @@ export class ProjectEntity extends CommonBaseEntity {
   @Prop({ type: Number, default: 0 })
   carbonCredits: number; // total number of carbon credits received
 
+  @IsString()
   @Prop({ default: '<div>Product Development Document</div>' })
   pddTemplate?: string; // html content here
 

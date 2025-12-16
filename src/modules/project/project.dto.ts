@@ -69,3 +69,7 @@ export class UpdateProjectDocumentIn extends PartialType(
     'updatedById',
   ] as const),
 ) {}
+
+export class UpdatePddTemplateIn extends PickType(ProjectEntity, [
+  'pddTemplate',
+] as const) {}
