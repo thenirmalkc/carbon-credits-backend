@@ -12,7 +12,12 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CreateTverProjectIn, GetProjectsQuery } from './project.dto';
+import {
+  CreateTverProjectIn,
+  GetProjectsQuery,
+  UpdateProjectIn,
+} from './project.dto';
+import { BypassAuth } from '../auth/decorators/bypass-auth.decorator';
 
 @ApiTags('Project')
 @ApiBearerAuth()
@@ -30,11 +35,18 @@ export class ProjectController {
   async createTverProject(@Body() body: CreateTverProjectIn) {
     body.standardYear = '2025';
     const projectId = await this.projectService.createTverProject(body);
-    return this.getProject(projectId.toString());
+    return this.projectService.getProject(projectId.toString());
   }
 
+  @BypassAuth()
   @Put(':id')
-  updateTverProject(@Body() body: any) {}
+  async updateProject(@Param('id') id: string, @Body() body: UpdateProjectIn) {
+    const updated = await this.projectService.updateProject(id, body);
+    if (!updated) {
+      throw new HttpException('Failed to update', 400);
+    }
+    return this.projectService.getProject(id);
+  }
 
   @Get(':id')
   async getProject(@Param('id') id: string) {

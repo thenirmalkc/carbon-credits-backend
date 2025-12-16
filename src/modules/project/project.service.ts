@@ -6,7 +6,11 @@ import {
   ProjectDocumentsDocument,
   ProjectDocumentsEntity,
 } from './entity/project-document.entity';
-import { CreateTverProjectIn, GetProjectsQuery } from './project.dto';
+import {
+  CreateTverProjectIn,
+  GetProjectsQuery,
+  UpdateProjectIn,
+} from './project.dto';
 import { FileUploadService } from '../file-upload/file-upload.service';
 
 @Injectable()
@@ -32,6 +36,48 @@ export class ProjectService {
         await this.projectDocumentsModel.create(body.documents, { session });
       }
       return projectId;
+    });
+  }
+
+  async updateProject(id: string, body: UpdateProjectIn) {
+    const projectId = new Types.ObjectId(id);
+    const session = await this.mongoConn.startSession();
+    return session.withTransaction(async () => {
+      const documents = body.documents;
+      delete body._id;
+      const updated = await this.projectModel.updateOne(
+        {
+          _id: projectId,
+          deletedAt: { $exists: false },
+        },
+        { $set: body },
+        { session },
+      );
+      if (Array.isArray(documents)) {
+        const documentIds = documents.map((x) => x._id).filter((x) => !!x);
+        await this.projectDocumentsModel.deleteMany(
+          {
+            _id: { $nin: documentIds },
+            projectId: projectId,
+          },
+          { session },
+        );
+        for (const document of documents) {
+          if (document._id) {
+            const documentId = document._id;
+            delete document._id;
+            await this.projectDocumentsModel.updateOne(
+              { _id: documentId },
+              { $set: document },
+              { session },
+            );
+          } else {
+            document.projectId = projectId;
+            await this.projectDocumentsModel.create([document], { session });
+          }
+        }
+      }
+      return updated.matchedCount;
     });
   }
 
@@ -138,6 +184,6 @@ export class ProjectService {
       },
       { $project: { total: 1, items: 1 } },
     ]);
-    return result;
+    return result[0];
   }
 }

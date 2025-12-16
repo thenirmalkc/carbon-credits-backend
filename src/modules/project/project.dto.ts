@@ -1,4 +1,4 @@
-import { PickType } from '@nestjs/swagger';
+import { PartialType, PickType } from '@nestjs/swagger';
 import { ProjectEntity } from './entity/project.entity';
 import { ProjectDocumentsEntity } from './entity/project-document.entity';
 import { IsArray, IsEnum, IsOptional, ValidateNested } from 'class-validator';
@@ -41,14 +41,17 @@ export class GetProjectsQuery extends BaseQueryDto {
   projectStandard?: ProjectStandardEnum;
 }
 
-export class UpdateProjectIn extends PickType(ProjectEntity, [
-  'projectTitle',
-  'additionalInfo',
-  'projectOwners',
-  'locations',
-  'tver',
-  'updatedById',
-] as const) {
+export class UpdateProjectIn extends PartialType(
+  PickType(ProjectEntity, [
+    '_id',
+    'projectTitle',
+    'additionalInfo',
+    'projectOwners',
+    'locations',
+    'tver',
+    'updatedById',
+  ] as const),
+) {
   @Type(() => UpdateProjectDocumentIn)
   @IsArray()
   @ValidateNested({ each: true })
@@ -56,10 +59,13 @@ export class UpdateProjectIn extends PickType(ProjectEntity, [
   documents?: UpdateProjectDocumentIn[];
 }
 
-export class UpdateProjectDocumentIn extends PickType(ProjectDocumentsEntity, [
-  'filePath',
-  'userDescription',
-  'projectId',
-  'createdById',
-  'updatedById',
-] as const) {}
+export class UpdateProjectDocumentIn extends PartialType(
+  PickType(ProjectDocumentsEntity, [
+    '_id',
+    'filePath',
+    'userDescription',
+    'projectId',
+    'createdById',
+    'updatedById',
+  ] as const),
+) {}

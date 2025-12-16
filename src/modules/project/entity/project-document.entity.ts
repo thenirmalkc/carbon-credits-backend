@@ -34,6 +34,7 @@ export class ProjectDocumentsEntity extends CommonBaseEntity {
   content: string; // file content here
   // ---------------------------------
 
+  @ApiHideProperty()
   @Prop()
   projectId?: Types.ObjectId;
 
@@ -42,6 +43,7 @@ export class ProjectDocumentsEntity extends CommonBaseEntity {
   @Prop()
   createdById: Types.ObjectId;
 
+  @ApiHideProperty()
   @Allow()
   @Prop()
   updatedById?: Types.ObjectId;

@@ -7,7 +7,7 @@ import {
 import { map, Observable } from 'rxjs';
 import { UserI } from '../types';
 import { Response } from 'express';
-import { instanceToPlain } from 'class-transformer';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class HttpInterceptor implements NestInterceptor {
@@ -87,6 +87,7 @@ function populateData(data: any, user: UserI) {
       }
     }
     if (data._id) {
+      data._id = new Types.ObjectId(data._id);
       data.updatedById = user._id;
     } else {
       data.createdById = user._id;

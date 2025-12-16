@@ -1,12 +1,11 @@
 import { Prop } from '@nestjs/mongoose';
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Types } from 'mongoose';
-import { ForeignKey } from '../dtos/foreign-key.dto';
 import { Transform } from 'class-transformer';
 import { Allow } from 'class-validator';
 
 export class CommonBaseEntity {
-  @ApiProperty(ForeignKey)
+  @ApiHideProperty()
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? new Types.ObjectId(value) : value,
   )
