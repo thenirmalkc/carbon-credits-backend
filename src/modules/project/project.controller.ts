@@ -5,6 +5,7 @@ import {
   HttpException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -27,9 +28,13 @@ export class ProjectController {
 
   @Post('tver')
   async createTverProject(@Body() body: CreateTverProjectIn) {
+    body.standardYear = '2025';
     const projectId = await this.projectService.createTverProject(body);
     return this.getProject(projectId.toString());
   }
+
+  @Put(':id')
+  updateTverProject(@Body() body: any) {}
 
   @Get(':id')
   async getProject(@Param('id') id: string) {

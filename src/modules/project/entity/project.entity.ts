@@ -87,8 +87,9 @@ export class ProjectEntity extends CommonBaseEntity {
   @Prop()
   projectStandard: ProjectStandardEnum;
 
+  @ApiHideProperty()
   @Prop()
-  standardYear: Date;
+  standardYear: string;
   // --------------------------------
 
   @Prop()

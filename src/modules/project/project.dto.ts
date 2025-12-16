@@ -9,6 +9,7 @@ import { ProjectStandardEnum, ProjectTypeEnum } from './project.enum';
 export class CreateTverProjectIn extends PickType(ProjectEntity, [
   'projectType',
   'projectStandard',
+  'standardYear',
   'projectTitle',
   'additionalInfo',
   'projectOwners',
@@ -25,7 +26,6 @@ export class CreateTverProjectIn extends PickType(ProjectEntity, [
 
 export class CreateProjectDocumentIn extends PickType(ProjectDocumentsEntity, [
   'filePath',
-  'filePath',
   'userDescription',
   'projectId',
   'createdById',
@@ -33,8 +33,33 @@ export class CreateProjectDocumentIn extends PickType(ProjectDocumentsEntity, [
 
 export class GetProjectsQuery extends BaseQueryDto {
   @IsEnum(ProjectTypeEnum)
-  projectType: ProjectTypeEnum;
+  @IsOptional()
+  projectType?: ProjectTypeEnum;
 
   @IsEnum(ProjectStandardEnum)
-  projectStandard: ProjectStandardEnum;
+  @IsOptional()
+  projectStandard?: ProjectStandardEnum;
 }
+
+export class UpdateProjectIn extends PickType(ProjectEntity, [
+  'projectTitle',
+  'additionalInfo',
+  'projectOwners',
+  'locations',
+  'tver',
+  'updatedById',
+] as const) {
+  @Type(() => UpdateProjectDocumentIn)
+  @IsArray()
+  @ValidateNested({ each: true })
+  @IsOptional()
+  documents?: UpdateProjectDocumentIn[];
+}
+
+export class UpdateProjectDocumentIn extends PickType(ProjectDocumentsEntity, [
+  'filePath',
+  'userDescription',
+  'projectId',
+  'createdById',
+  'updatedById',
+] as const) {}

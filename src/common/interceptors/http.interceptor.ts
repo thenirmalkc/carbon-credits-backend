@@ -20,7 +20,7 @@ export class HttpInterceptor implements NestInterceptor {
     // }
 
     if (req.body && req.user && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
-      populateData(req.body, req.user, req.method);
+      populateData(req.body, req.user);
     }
 
     return next.handle().pipe(
@@ -74,27 +74,31 @@ function processBody(data: any) {
 /* eslint-enable */
 
 /* eslint-disable */
-function populateData(data: any, user: UserI, method: string) {
+function populateData(data: any, user: UserI) {
   if (Array.isArray(data)) {
     for (const d of data) {
-      populateData(d, user, method);
+      populateData(d, user);
     }
-  } else if (data instanceof Object) {
+  } else if (isPlainObject(data)) {
     for (const k in data) {
-      const value = data[k];
-      if (!value) continue;
-      if (Array.isArray(value) || value instanceof Object) {
-        populateData(value, user, method);
+      if (!data[k]) continue;
+      if (Array.isArray(data[k]) || isPlainObject(data[k])) {
+        populateData(data[k], user);
       }
     }
-    // populate createdBy
-    if (method === 'POST') {
+    if (data._id) {
+      data.updatedById = user._id;
+    } else {
       data.createdById = user._id;
     }
-    // populate updatedBy
-    else if (['PUT', 'PATCH'].includes(method)) {
-      data.updatedById = user._id;
-    }
   }
+}
+/* eslint-enable */
+
+/* eslint-disable */
+function isPlainObject(value: unknown) {
+  if (value === null || typeof value !== 'object') return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
 }
 /* eslint-enable */
