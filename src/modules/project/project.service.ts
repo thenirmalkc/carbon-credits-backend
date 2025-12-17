@@ -239,7 +239,12 @@ export class ProjectService {
     if (!project) {
       throw new HttpException('Project not found', 404);
     }
-    return { pddTemplate: await this.formatHtmlByAi(this.tverTemplate) };
+    // generate pdd template
+    await this.projectModel.updateOne(
+      { _id: new Types.ObjectId(id) },
+      { $set: { pddTemplate: this.tverTemplate } },
+    );
+    return { pddTemplate: this.tverTemplate };
   }
 
   async formatHtmlByAi(html: string) {
