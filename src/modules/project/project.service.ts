@@ -239,11 +239,38 @@ export class ProjectService {
     if (!project) {
       throw new HttpException('Project not found', 404);
     }
-    return { pddTemplate: this.tverTemplate };
+    return { pddTemplate: await this.formatHtmlByAi(this.tverTemplate) };
   }
 
-  formatHtmlByAi(html: string) {
-    const prompt = ``;
-    return html;
+  async formatHtmlByAi(html: string) {
+    const prompt = `You are an expert HTML styler.
+Given an HTML snippet, apply inline CSS styles only to the specified elements and leave everything else unchanged.
+
+RULES:
+1) Apply this inline CSS to all <table> elements:
+   border-collapse: collapse; width: 100%;
+2) Apply this inline CSS to all <th> elements:
+   border: 1px solid black; padding: 8px; background-color: #f2f2f2;
+3) Apply this inline CSS to all <td> elements:
+   border: 1px solid black; padding: 8px;
+
+CONSTRAINTS:
+- Do NOT modify text content.
+- Do NOT add, remove, or reorder HTML elements.
+- Do NOT add classes or external styles.
+- Output only the updated HTML.
+
+INPUT:
+[${html}]`;
+    const response = await this.openaiService.client.chat.completions.create({
+      model: 'gpt-4.1-mini',
+      temperature: 1,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const output = response.choices[0].message.content;
+    if (!output) {
+      throw new Error('Failed to generate output');
+    }
+    return output;
   }
 }
