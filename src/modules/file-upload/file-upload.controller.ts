@@ -49,6 +49,11 @@ export class FileUploadController {
           file.fileType = FileTypeEnum.IMAGE;
         } else if (file.mimetype === 'application/pdf') {
           file.fileType = FileTypeEnum.PDF;
+        } else if (
+          file.mimetype ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ) {
+          file.fileType = FileTypeEnum.CSV;
         } else {
           return callback(null, false);
         }
