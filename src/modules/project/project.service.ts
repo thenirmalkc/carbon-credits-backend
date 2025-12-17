@@ -223,6 +223,7 @@ export class ProjectService {
       },
     ]);
     if (!projects.length) return null;
+    projects[0].pddTemplate = projects[0].pddTemplate || '';
     return projects[0];
   }
 
@@ -242,88 +243,96 @@ export class ProjectService {
     if (!project) {
       throw new HttpException('Project not found', 404);
     }
-    // generate pdd template
+    // wip: generate pdd template
+    // 1 generate pdd template using given data
+    // 2 format pdd template
+    const formattedPddTemplate = await this.formatHtmlByAi(this.tverTemplate);
     await this.projectModel.updateOne(
       { _id: new Types.ObjectId(id) },
-      { $set: { pddTemplate: this.tverTemplate } },
+      { $set: { pddTemplate: formattedPddTemplate } },
     );
-    return { pddTemplate: this.tverTemplate };
+    return { pddTemplate: formattedPddTemplate };
   }
 
-  async runScript(generated: string = ''): Promise<string> {
-    const systemPrompt = `You are an expert at writing children stories.`;
-    let userPrompt = `INSTRUCTION: Write a children story. Output should be children words. No other output is allowed.`;
+  async formatHtmlByAi(html: string, generated: string = ''): Promise<string> {
+    const systemPrompt = `You are an expert at styling HTML content using inline CSS. You focus on readability, proper spacing, consistent fonts, colors, and clean layout without changing the text content or HTML structure.`;
+    let userPrompt = `TASK: You are provided with HTML content. Your goal is to apply high-quality inline CSS to make the content visually appealing, readable, and well-formatted. 
+Guidelines:
+- Use readable fonts like Arial, Helvetica, or sans-serif.
+- Set font sizes appropriate for headings, paragraphs, and tables.
+- Add padding and margins to elements for spacing.
+- Add borders or background colors for tables and sections where appropriate.
+- Ensure text colors have good contrast with background.
+- Do not change or remove any text content.
+- Maintain the original HTML structure.
+INPUT HTML:
+[${html}]
+OUTPUT: Return only the HTML content with inline CSS applied. No explanations or additional text.`;
     if (generated) {
-      userPrompt += `\nA portion of story has already been generated. Continue generating from the given context. The final output should adhere to the provided INSTRUCTION. GIVEN CONTEXT: [${generated}]`;
+      userPrompt += `\nA portion of output has already been generated. Continue generating from: [${generated}]`;
     }
     const response = await this.openaiService.client.chat.completions.create({
       model: 'gpt-4.1-nano',
       temperature: 0,
+      max_completion_tokens: 1500, // increased for detailed styling
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      max_completion_tokens: 100, // increased
     });
-
     const output = response.choices[0].message?.content;
-    if (!output) throw new Error('Failed to generate output');
-
+    if (!output) {
+      throw new Error('Failed to generate output');
+    }
     generated += output;
-    const finishReason = response.choices[0].finish_reason;
-    if (finishReason === 'length') {
-      return this.runScript(generated);
+    if (response.choices[0].finish_reason === 'length') {
+      return this.formatHtmlByAi(html, generated);
     }
     return generated;
   }
 
-  // async runScript() {
-  //   const systemPrompt = `You are an expert in HTML cleanup and sanitization.
-
-  // TASK:
-  // Given an HTML document, output the same document while preserving the original
-  // element structure and text content, but removing the following:
-
-  // - <style> tags
-  // - <img> tags
-  // - All class attributes
-  // - All id attributes
-  // - All style attributes (inline CSS)
-
-  // INPUT:
-  // [HTML content]
-
-  // OUTPUT:
-  // [Cleaned HTML content]
-
-  // Rules:
-  // - Do not add, rename, or reorder elements.
-  // - Do not add new text or explanations.
-  // - Remove specified tags entirely.
-  // - Output only the resulting HTML. No other output is allowed.`;
-  //   const userPrompt = `INPUT: [${fs
-  //     .readFileSync(path.join(__dirname, '../../templates/index.html'))
-  //     .toString()}]`;
-  //   const response = await this.openaiService.client.chat.completions.create({
-  //     model: 'gpt-4.1-mini',
-  //     temperature: 0,
-  //     messages: [
-  //       { role: 'system', content: systemPrompt },
-  //       { role: 'user', content: userPrompt },
-  //     ],
-  //   });
-  //   const finishedReason = response.choices[0].finish_reason;
-  //   if (finishedReason !== 'stop') {
-  //     throw new Error(`Finished reason: ${finishedReason}`);
-  //   }
-  //   const output = response.choices[0].message.content;
-  //   if (!output) {
-  //     throw new Error('Failed to generate output');
-  //   }
-  //   fs.writeFileSync(
-  //     path.join(__dirname, '../../templates/output.html'),
-  //     output,
-  //   );
-  //   return true;
-  // }
+  async runScript() {
+    // const systemPrompt = `You are an expert in HTML cleanup and sanitization.
+    // TASK:
+    // Given an HTML document, output the same document while preserving the original
+    // element structure and text content, but removing the following:
+    // - <style> tags
+    // - <img> tags
+    // - All class attributes
+    // - All id attributes
+    // - All style attributes (inline CSS)
+    // INPUT:
+    // [HTML content]
+    // OUTPUT:
+    // [Cleaned HTML content]
+    // Rules:
+    // - Do not add, rename, or reorder elements.
+    // - Do not add new text or explanations.
+    // - Remove specified tags entirely.
+    // - Output only the resulting HTML. No other output is allowed.`;
+    // const userPrompt = `INPUT: [${fs
+    //   .readFileSync(path.join(__dirname, '../../templates/index.html'))
+    //   .toString()}]`;
+    // const response = await this.openaiService.client.chat.completions.create({
+    //   model: 'gpt-4.1-mini',
+    //   temperature: 0,
+    //   messages: [
+    //     { role: 'system', content: systemPrompt },
+    //     { role: 'user', content: userPrompt },
+    //   ],
+    // });
+    // const finishedReason = response.choices[0].finish_reason;
+    // if (finishedReason !== 'stop') {
+    //   throw new Error(`Finished reason: ${finishedReason}`);
+    // }
+    // const output = response.choices[0].message.content;
+    // if (!output) {
+    //   throw new Error('Failed to generate output');
+    // }
+    // fs.writeFileSync(
+    //   path.join(__dirname, '../../templates/output.html'),
+    //   output,
+    // );
+    // return true;
+  }
 }
