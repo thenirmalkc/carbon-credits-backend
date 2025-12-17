@@ -254,9 +254,20 @@ export class ProjectService {
     return { pddTemplate: formattedPddTemplate };
   }
 
-  async formatHtmlByAi(html: string, generated: string = ''): Promise<string> {
+  async formatHtmlByAi(
+    html: string,
+    generated: string = '',
+    attempts: number = 3,
+  ): Promise<string> {
+    attempts -= 1;
+    if (attempts > 3) {
+      throw new Error('Cannot set more that 3 attempts');
+    }
+    if (attempts < 0) {
+      throw new Error('Failed to generate output within 3 attempts');
+    }
     const systemPrompt = `You are an expert at styling HTML content using inline CSS. You focus on readability, proper spacing, consistent fonts, colors, and clean layout without changing the text content or HTML structure.`;
-    let userPrompt = `TASK: You are provided with HTML content. Your goal is to apply high-quality inline CSS to make the content visually appealing, readable, and well-formatted. 
+    let userPrompt = `TASK: You are provided with HTML content. Your goal is to apply high-quality inline CSS to make the content visually appealing, readable, and well-formatted.
 Guidelines:
 - Use readable fonts like Arial, Helvetica, or sans-serif.
 - Set font sizes appropriate for headings, paragraphs, and tables.
@@ -267,7 +278,7 @@ Guidelines:
 - Maintain the original HTML structure.
 INPUT HTML:
 [${html}]
-OUTPUT: Return only the HTML content with inline CSS applied. No explanations or additional text.`;
+OUTPUT: Return final HTML content with inline CSS applied. No other output is applied.`;
     if (generated) {
       userPrompt += `\nA portion of output has already been generated. Continue generating from: [${generated}]`;
     }
