@@ -14,10 +14,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BypassAuth } from '../auth/decorators/bypass-auth.decorator';
 import { User } from '../auth/decorators/user.decorator';
 import { UserI } from '../../common/types';
+import { Roles } from '../auth/decorators/role.decorator';
+import { UserRoleEnum } from './user.enum';
+import { RoleGuard } from '../auth/guards/role.guard';
 
 @ApiTags('User')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -29,6 +32,17 @@ export class UserController {
       throw new HttpException('User not found', 404);
     }
     return userData;
+  }
+
+  @Roles(UserRoleEnum.ADMIN)
+  @Get('admin-dashboard')
+  getAdminDashboard() {
+    return this.userService.getDashboard();
+  }
+
+  @Get('user-dashboard')
+  getUserDashboard(@User() user: UserI) {
+    return this.userService.getDashboard(user.id);
   }
 
   @Put()

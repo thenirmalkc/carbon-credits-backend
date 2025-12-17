@@ -1,10 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model, PipelineStage, Types } from 'mongoose';
 import { UserDocument, UserEntity } from './entity/user.entity';
 import { RegisterUserIn, SeedAdminIn, UpdateUserIn } from './user.dto';
 import { UserRoleEnum } from './user.enum';
 import { AuthService } from '../auth/auth.service';
+import { ProjectVerificationStatusEnum } from '../project/project.enum';
 
 @Injectable()
 export class UserService {
@@ -12,6 +13,7 @@ export class UserService {
     @InjectModel(UserEntity.name)
     private readonly userModel: Model<UserDocument>,
     private readonly authService: AuthService,
+    @InjectConnection() private readonly mongoConn: Connection,
   ) {}
 
   async seedAdmin(body: SeedAdminIn) {
@@ -69,5 +71,47 @@ export class UserService {
       { $set: body },
     );
     return updated.matchedCount;
+  }
+
+  async getDashboard(userId?: string) {
+    const dashboard: Record<string, Record<string, number>> = {
+      'Project verification status': { Total: 0 },
+    };
+    const userPipeline: PipelineStage[] = [];
+    if (userId) {
+      userPipeline.push({
+        $match: { createdById: new Types.ObjectId(userId) },
+      });
+    }
+
+    // -------------- project status ---------------------
+    const pipeline: PipelineStage[] = [
+      ...userPipeline,
+      { $match: { deletedAt: { $exists: false } } },
+      {
+        $group: {
+          _id: {
+            $ifNull: [
+              '$verificationStatus',
+              ProjectVerificationStatusEnum.PENDING,
+            ],
+          },
+          total: { $sum: 1 },
+        },
+      },
+    ];
+    const projectStatuses = await this.mongoConn
+      .collection('project')
+      .aggregate<{ _id: string; total: number }>(pipeline)
+      .toArray();
+    for (const status of Object.values<string>(ProjectVerificationStatusEnum)) {
+      dashboard['Project verification status'][status] =
+        projectStatuses.find((x) => x._id === status)?.total || 0;
+      dashboard['Project verification status']['Total'] +=
+        dashboard['Project verification status'][status];
+    }
+    // xxxxxxxxxxxxxxxx project status xxxxxxxxxxxxxxxx
+
+    return dashboard;
   }
 }

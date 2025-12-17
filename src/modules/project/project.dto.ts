@@ -1,4 +1,4 @@
-import { PartialType, PickType } from '@nestjs/swagger';
+import { ApiHideProperty, PartialType, PickType } from '@nestjs/swagger';
 import { ProjectEntity } from './entity/project.entity';
 import { ProjectDocumentsEntity } from './entity/project-document.entity';
 import {
@@ -11,6 +11,7 @@ import {
 import { Type } from 'class-transformer';
 import { BaseQueryDto } from 'src/common/dtos/base-query.dto';
 import { ProjectStandardEnum, ProjectTypeEnum } from './project.enum';
+import { Types } from 'mongoose';
 
 export class CreateTverProjectIn extends PickType(ProjectEntity, [
   'projectType',
@@ -49,6 +50,9 @@ export class GetProjectsQuery extends BaseQueryDto {
   @IsString()
   @IsOptional()
   search?: string;
+
+  @ApiHideProperty()
+  myUserId?: Types.ObjectId;
 }
 
 export class UpdateProjectIn extends PartialType(

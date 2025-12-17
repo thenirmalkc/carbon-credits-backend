@@ -21,16 +21,36 @@ import {
 } from './project.dto';
 import htmlToDocx from '@turbodocx/html-to-docx';
 import { Response } from 'express';
+import { BypassAuth } from '../auth/decorators/bypass-auth.decorator';
+import { User } from '../auth/decorators/user.decorator';
+import { UserI } from 'src/common/types';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { UserRoleEnum } from '../user/user.enum';
 
 @ApiTags('Project')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('projects')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
+  // for testing purpose only
+  @BypassAuth()
+  @Post('run-script')
+  runScript() {
+    return this.projectService.runScript();
+  }
+
+  @Roles(UserRoleEnum.ADMIN)
   @Get()
   getProjects(@Query() filter: GetProjectsQuery) {
+    return this.projectService.getProjects(filter);
+  }
+
+  @Get('my-projects')
+  getMyProjects(@Query() filter: GetProjectsQuery, @User() user: UserI) {
+    filter.myUserId = user._id;
     return this.projectService.getProjects(filter);
   }
 

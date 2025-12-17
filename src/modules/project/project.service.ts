@@ -168,6 +168,9 @@ export class ProjectService {
     if (filter.projectStandard) {
       matchStage['projectStandard'] = filter.projectStandard;
     }
+    if (filter.myUserId) {
+      matchStage['createdById'] = filter.myUserId;
+    }
     const result = await this.projectModel.aggregate<ProjectEntity>([
       {
         $facet: {
@@ -277,5 +280,56 @@ INPUT:
       throw new Error('Failed to generate output');
     }
     return output;
+  }
+
+  async runScript() {
+    const systemPrompt = `You are an expert in HTML cleanup and sanitization.
+
+TASK:
+Given an HTML document, output the same document while preserving the original
+element structure and text content, but removing the following:
+
+- <style> tags
+- <img> tags
+- All class attributes
+- All id attributes
+- All style attributes (inline CSS)
+
+INPUT:
+[HTML content]
+
+OUTPUT:
+[Cleaned HTML content]
+
+Rules:
+- Do not add, rename, or reorder elements.
+- Do not add new text or explanations.
+- Remove specified tags entirely.
+- Output only the resulting HTML. No other output is allowed.`;
+    const userPrompt = `INPUT: [${fs
+      .readFileSync(path.join(__dirname, '../../templates/index.html'))
+      .toString()}]`;
+    const response = await this.openaiService.client.chat.completions.create({
+      model: 'gpt-4.1-mini',
+      temperature: 1,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+    });
+    const finishedReason = response.choices[0].finish_reason;
+    if (finishedReason !== 'stop') {
+      throw new Error(`Finished reason: ${finishedReason}`);
+    }
+    console.log(finishedReason, 'finished reason...');
+    const output = response.choices[0].message.content;
+    if (!output) {
+      throw new Error('Failed to generate output');
+    }
+    fs.writeFileSync(
+      path.join(__dirname, '../../templates/output.html'),
+      output,
+    );
+    return true;
   }
 }
