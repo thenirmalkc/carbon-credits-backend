@@ -250,40 +250,35 @@ export class ProjectService {
     return { pddTemplate: this.tverTemplate };
   }
 
-  async formatHtmlByAi(html: string) {
-    const prompt = `You are an expert HTML styler.
-Given an HTML snippet, apply inline CSS styles only to the specified elements and leave everything else unchanged.
-
-RULES:
-1) Apply this inline CSS to all <table> elements:
-   border-collapse: collapse; width: 100%;
-2) Apply this inline CSS to all <th> elements:
-   border: 1px solid black; padding: 8px; background-color: #f2f2f2;
-3) Apply this inline CSS to all <td> elements:
-   border: 1px solid black; padding: 8px;
-
-CONSTRAINTS:
-- Do NOT modify text content.
-- Do NOT add, remove, or reorder HTML elements.
-- Do NOT add classes or external styles.
-- Output only the updated HTML.
-
-INPUT:
-[${html}]`;
-    const response = await this.openaiService.client.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      temperature: 1,
-      messages: [{ role: 'user', content: prompt }],
-    });
-    const output = response.choices[0].message.content;
-    if (!output) {
-      throw new Error('Failed to generate output');
+  async runScript(generated: string = ''): Promise<string> {
+    const systemPrompt = `You are an expert at writing children stories.`;
+    let userPrompt = `INSTRUCTION: Write a children story. Output should be children words. No other output is allowed.`;
+    if (generated) {
+      userPrompt += `\nA portion of story has already been generated. Continue generating from the given context. The final output should adhere to the provided INSTRUCTION. GIVEN CONTEXT: [${generated}]`;
     }
-    return output;
+    const response = await this.openaiService.client.chat.completions.create({
+      model: 'gpt-4.1-nano',
+      temperature: 0,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      max_completion_tokens: 100, // increased
+    });
+
+    const output = response.choices[0].message?.content;
+    if (!output) throw new Error('Failed to generate output');
+
+    generated += output;
+    const finishReason = response.choices[0].finish_reason;
+    if (finishReason === 'length') {
+      return this.runScript(generated);
+    }
+    return generated;
   }
 
-  //   async runScript() {
-  //     const systemPrompt = `You are an expert in HTML cleanup and sanitization.
+  // async runScript() {
+  //   const systemPrompt = `You are an expert in HTML cleanup and sanitization.
 
   // TASK:
   // Given an HTML document, output the same document while preserving the original
@@ -306,47 +301,29 @@ INPUT:
   // - Do not add new text or explanations.
   // - Remove specified tags entirely.
   // - Output only the resulting HTML. No other output is allowed.`;
-  //     const userPrompt = `INPUT: [${fs
-  //       .readFileSync(path.join(__dirname, '../../templates/index.html'))
-  //       .toString()}]`;
-  //     const response = await this.openaiService.client.chat.completions.create({
-  //       model: 'gpt-4.1-mini',
-  //       temperature: 1,
-  //       messages: [
-  //         { role: 'system', content: systemPrompt },
-  //         { role: 'user', content: userPrompt },
-  //       ],
-  //     });
-  //     const finishedReason = response.choices[0].finish_reason;
-  //     if (finishedReason !== 'stop') {
-  //       throw new Error(`Finished reason: ${finishedReason}`);
-  //     }
-  //     console.log(finishedReason, 'finished reason...');
-  //     const output = response.choices[0].message.content;
-  //     if (!output) {
-  //       throw new Error('Failed to generate output');
-  //     }
-  //     fs.writeFileSync(
-  //       path.join(__dirname, '../../templates/output.html'),
-  //       output,
-  //     );
-  //     return true;
+  //   const userPrompt = `INPUT: [${fs
+  //     .readFileSync(path.join(__dirname, '../../templates/index.html'))
+  //     .toString()}]`;
+  //   const response = await this.openaiService.client.chat.completions.create({
+  //     model: 'gpt-4.1-mini',
+  //     temperature: 0,
+  //     messages: [
+  //       { role: 'system', content: systemPrompt },
+  //       { role: 'user', content: userPrompt },
+  //     ],
+  //   });
+  //   const finishedReason = response.choices[0].finish_reason;
+  //   if (finishedReason !== 'stop') {
+  //     throw new Error(`Finished reason: ${finishedReason}`);
   //   }
-
-  async runScript() {
-    const userPrompt = `Give me a children story of 100 words. The output should only include the final story. No other type of output is allowed.`;
-    const response = await this.openaiService.client.chat.completions.create({
-      model: 'gpt-4.1-nano',
-      temperature: 0.7,
-      messages: [{ role: 'user', content: userPrompt }],
-      max_completion_tokens: 20,
-    });
-    const finishedReason = response.choices[0].finish_reason;
-    console.log(finishedReason, 'finished reason');
-    const output = response.choices[0].message.content;
-    if (!output) {
-      throw new Error('Failed to generate output');
-    }
-    return output;
-  }
+  //   const output = response.choices[0].message.content;
+  //   if (!output) {
+  //     throw new Error('Failed to generate output');
+  //   }
+  //   fs.writeFileSync(
+  //     path.join(__dirname, '../../templates/output.html'),
+  //     output,
+  //   );
+  //   return true;
+  // }
 }

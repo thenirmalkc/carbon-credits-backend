@@ -74,8 +74,9 @@ export class UserService {
   }
 
   async getDashboard(userId?: string) {
-    const dashboard: Record<string, Record<string, number>> = {
-      'Project verification status': { Total: 0 },
+    const dashboard: Record<string, number> = {
+      totalProjects: 0,
+      totalCarbonCredits: 0,
     };
     const userPipeline: PipelineStage[] = [];
     if (userId) {
@@ -85,7 +86,7 @@ export class UserService {
     }
 
     // -------------- project status ---------------------
-    const pipeline: PipelineStage[] = [
+    let pipeline: PipelineStage[] = [
       ...userPipeline,
       { $match: { deletedAt: { $exists: false } } },
       {
@@ -105,12 +106,31 @@ export class UserService {
       .aggregate<{ _id: string; total: number }>(pipeline)
       .toArray();
     for (const status of Object.values<string>(ProjectVerificationStatusEnum)) {
-      dashboard['Project verification status'][status] =
+      const key = `total${status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}Projects`;
+      dashboard[key] =
         projectStatuses.find((x) => x._id === status)?.total || 0;
-      dashboard['Project verification status']['Total'] +=
-        dashboard['Project verification status'][status];
+      dashboard['totalProjects'] += dashboard[key];
     }
     // xxxxxxxxxxxxxxxx project status xxxxxxxxxxxxxxxx
+
+    // ---------------- carbon credits ------------------
+    pipeline = [
+      ...userPipeline,
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$carbonCredits' },
+        },
+      },
+    ];
+    const carbonCredits = await this.mongoConn
+      .collection('project')
+      .aggregate<{ _id: null; total: number }>(pipeline)
+      .toArray();
+    for (const cc of carbonCredits) {
+      dashboard['totalCarbonCredits'] += cc.total;
+    }
+    // xxxxxxxxxxxxxxxx carbon credits xxxxxxxxxxxxxxxxxx
 
     return dashboard;
   }
