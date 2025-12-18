@@ -411,16 +411,29 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
       }
       matchStage['date'] = dateFilter;
     }
-    console.log(matchStage, 'match stage...');
-    const total = await this.solarMeterLogsModel.aggregate([
+    const total = await this.solarMeterLogsModel.aggregate<{ total: number }>([
       { $match: matchStage },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: 1 },
-        },
-      },
+      { $count: 'total' },
     ]);
-    console.log(total, 'total....');
+    const items =
+      await this.solarMeterLogsModel.aggregate<SolarMeterLogsEntity>([
+        { $match: matchStage },
+        { $sort: { date: -1 } },
+        { $skip: filter.offset },
+        { $limit: filter.limit },
+        {
+          $project: {
+            _id: 1,
+            date: 1,
+            totalProduction: 1,
+            onPeakProduction: 1,
+            offPeakProduction: 1,
+          },
+        },
+      ]);
+    return {
+      total: total.length ? total[0].total : 0,
+      items,
+    };
   }
 }

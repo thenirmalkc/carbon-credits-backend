@@ -146,8 +146,7 @@ export class ProjectController {
     @Param('id') id: string,
     @Query() filter: GetSolarMeterLogsQuery,
   ) {
-    await this.projectService.getSolarMeterLogs(id, filter);
-    return true;
+    return this.projectService.getSolarMeterLogs(id, filter);
   }
 
   @Post(':id/upload-solar-meter-logs')
