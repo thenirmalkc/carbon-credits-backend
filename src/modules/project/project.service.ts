@@ -257,16 +257,23 @@ export class ProjectService {
     if (!project) {
       throw new HttpException('Project not found', 404);
     }
-    // // wip: generate pdd template
-    // // 1 generate pdd template using given data
-    // // 2 format pdd template
-    // const formattedPddTemplate = await this.formatHtmlByAi(this.tverTemplate);
-    const formattedPddTemplate = this.tverTemplate;
-    await this.projectModel.updateOne(
-      { _id: new Types.ObjectId(id) },
-      { $set: { pddTemplate: formattedPddTemplate } },
-    );
-    return { pddTemplate: formattedPddTemplate };
+    // // // wip: generate pdd template
+    // // // 1 generate pdd template using given data
+    // // // 2 format pdd template
+    // // const formattedPddTemplate = await this.formatHtmlByAi(this.tverTemplate);
+    // const formattedPddTemplate = this.tverTemplate;
+    // await this.projectModel.updateOne(
+    //   { _id: new Types.ObjectId(id) },
+    //   { $set: { pddTemplate: formattedPddTemplate } },
+    // );
+    // return { pddTemplate: formattedPddTemplate };
+    // const pdd = await this.generatePdd(id);
+    // const formattedPdd = await this.formatHtmlByAi(pdd);
+    // await this.projectModel.updateOne(
+    //   { _id: new Types.ObjectId(id) },
+    //   { $set: { pddTemplate: pdd } },
+    // );
+    return { pddTemplate: this.tverTemplate };
   }
 
   async generatePdd(id: string) {
@@ -274,8 +281,26 @@ export class ProjectService {
     if (!project) {
       throw new HttpException('Project not found', 404);
     }
-    const systemPrompt = ``;
-    const userPrompt = ``;
+    const systemPrompt = `You are an expert at generating Project Design Documents (PDD) for Tver Standard projects. Your task is to populate a provided HTML PDD template with exact data from the provided JSON project details and any additional information. You must not hallucinate, restructure, or add any extra content. Populate only where data is available. Do not apply any styling. Output only the final HTML.`;
+    const userPrompt = `Here is the HTML PDD template: [${this.tverTemplate}]  
+Here is the JSON project data: [${JSON.stringify(project)}]  
+Additional information: [My avg enery production is 2,551.14kWh for year 2025]  
+
+Populate the template exactly using the provided data. Output the final HTML only. No other output is allowed.`;
+    console.log(userPrompt, 'user prompt...');
+    const response = await this.openaiService.client.chat.completions.create({
+      model: 'gpt-4.1-mini',
+      temperature: 0,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+    });
+    const output = response.choices[0].message?.content;
+    if (!output) {
+      throw new Error('Failed to generate output');
+    }
+    return output;
   }
 
   async formatHtmlByAi(
@@ -307,9 +332,8 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
       userPrompt += `\nA portion of output has already been generated. Continue generating from: [${generated}]`;
     }
     const response = await this.openaiService.client.chat.completions.create({
-      model: 'gpt-4.1-nano',
+      model: 'gpt-4.1-mini',
       temperature: 0,
-      max_completion_tokens: 1500, // increased for detailed styling
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
