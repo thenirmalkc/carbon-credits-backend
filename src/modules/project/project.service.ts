@@ -405,31 +405,29 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
       matchStage['date'] = dateFilter;
     }
 
-    const _total = await this.solarMeterLogsModel.aggregate<{ total: number }>([
+    const _totalP = this.solarMeterLogsModel.aggregate<{ total: number }>([
       { $match: matchStage },
       { $count: 'total' },
     ]);
-    const total = _total.length ? _total[0].total : 0;
 
-    const items =
-      await this.solarMeterLogsModel.aggregate<SolarMeterLogsEntity>([
-        { $match: matchStage },
-        { $sort: { date: -1 } },
-        { $skip: filter.offset },
-        { $limit: filter.limit },
-        {
-          $project: {
-            _id: 1,
-            date: 1,
-            totalProduction: 1,
-            onPeakProduction: 1,
-            offPeakProduction: 1,
-          },
+    const itemsP = this.solarMeterLogsModel.aggregate<SolarMeterLogsEntity>([
+      { $match: matchStage },
+      { $sort: { date: -1 } },
+      { $skip: filter.offset },
+      { $limit: filter.limit },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          totalProduction: 1,
+          onPeakProduction: 1,
+          offPeakProduction: 1,
         },
-      ]);
+      },
+    ]);
 
     // ------------------------- calculation -------------------------
-    const _grandTotalProduction = await this.solarMeterLogsModel.aggregate<{
+    const _grandTotalProductionP = this.solarMeterLogsModel.aggregate<{
       total: number;
     }>([
       { $match: { projectId } },
@@ -440,11 +438,8 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
         },
       },
     ]);
-    const grandTotalProduction = _grandTotalProduction.length
-      ? _grandTotalProduction[0].total
-      : 0;
 
-    const _grandAvgProduction = await this.solarMeterLogsModel.aggregate<{
+    const _grandAvgProductionP = this.solarMeterLogsModel.aggregate<{
       total: number;
     }>([
       { $match: { projectId } },
@@ -455,11 +450,8 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
         },
       },
     ]);
-    const grandAvgProduction = _grandAvgProduction.length
-      ? _grandAvgProduction[0].total
-      : 0;
 
-    const _totalProduction = await this.solarMeterLogsModel.aggregate<{
+    const _totalProductionP = this.solarMeterLogsModel.aggregate<{
       total: number;
     }>([
       { $match: matchStage },
@@ -470,12 +462,34 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
         },
       },
     ]);
+
+    // xxxxxxxxxxxxxxxxxxxxxxxxx calculation xxxxxxxxxxxxxxxxxxxxxxxxx
+
+    const [
+      _total,
+      items,
+      _grandTotalProduction,
+      _grandAvgProduction,
+      _totalProduction,
+    ] = await Promise.all([
+      _totalP,
+      itemsP,
+      _grandTotalProductionP,
+      _grandAvgProductionP,
+      _totalProductionP,
+    ]);
+
+    const total = _total.length ? _total[0].total : 0;
+    const grandTotalProduction = _grandTotalProduction.length
+      ? _grandTotalProduction[0].total
+      : 0;
+    const grandAvgProduction = _grandAvgProduction.length
+      ? _grandAvgProduction[0].total
+      : 0;
     const totalProduction = _totalProduction.length
       ? _totalProduction[0].total
       : 0;
-
     const avgProduction = totalProduction / total;
-    // xxxxxxxxxxxxxxxxxxxxxxxxx calculation xxxxxxxxxxxxxxxxxxxxxxxxx
 
     return {
       grandTotalProduction,
