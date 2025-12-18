@@ -560,6 +560,7 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
     items.forEach((x) => {
       x.carbonCredits = (x.totalProduction / 1000) * filter.emissionFactor;
       totalCarbonCredits += x.carbonCredits;
+      x.carbonCredits = +x.carbonCredits.toFixed(4);
     });
     const avgCarbonCredits = (avgProduction / 1000) * filter.emissionFactor;
 
