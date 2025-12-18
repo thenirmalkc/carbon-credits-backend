@@ -9,13 +9,21 @@ import {
 import {
   CreateTverProjectIn,
   GetProjectsQuery,
+  GetSolarMeterLogsQuery,
   UpdatePddTemplateIn,
   UpdateProjectIn,
+  UploadSolarMeterLogsIn,
 } from './project.dto';
 import { FileUploadService } from '../file-upload/file-upload.service';
 import fs from 'fs';
 import path from 'path';
 import { OpenaiService } from 'src/common/services/openai.service';
+import pl from 'nodejs-polars';
+import { MyHttpService } from 'src/common/services/my-http.service';
+import {
+  SolarMeterLogsDocument,
+  SolarMeterLogsEntity,
+} from './entity/solar-meter-logs.entity';
 
 @Injectable()
 export class ProjectService {
@@ -27,8 +35,11 @@ export class ProjectService {
     private readonly projectModel: Model<ProjectDocument>,
     @InjectModel(ProjectDocumentsEntity.name)
     private readonly projectDocumentsModel: Model<ProjectDocumentsDocument>,
+    @InjectModel(SolarMeterLogsEntity.name)
+    private readonly solarMeterLogsModel: Model<SolarMeterLogsDocument>,
     private readonly fileUploadService: FileUploadService,
     private readonly openaiService: OpenaiService,
+    private readonly myHttpService: MyHttpService,
   ) {
     this.tverTemplate = fs
       .readFileSync(path.join(__dirname, '../../templates/tver-template.html'))
@@ -253,7 +264,8 @@ export class ProjectService {
     // wip: generate pdd template
     // 1 generate pdd template using given data
     // 2 format pdd template
-    const formattedPddTemplate = await this.formatHtmlByAi(this.tverTemplate);
+    // const formattedPddTemplate = await this.formatHtmlByAi(this.tverTemplate);
+    const formattedPddTemplate = this.tverTemplate;
     await this.projectModel.updateOne(
       { _id: new Types.ObjectId(id) },
       { $set: { pddTemplate: formattedPddTemplate } },
@@ -352,5 +364,41 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
     //   output,
     // );
     // return true;
+  }
+
+  async uploadSolarMeterLogs(id: string, body: UploadSolarMeterLogsIn) {
+    const url = await this.fileUploadService.getObjectSignedUrl(body.filePath);
+    const res = await this.myHttpService.get<{ data: string }>({ url });
+    const df = pl.readCSV(res.data);
+    const rows = <[string, number, number, number][]>df.rows();
+    if (!rows.length) return;
+    const projectId = new Types.ObjectId(id);
+    for (const row of rows) {
+      const date = new Date(row[0]);
+      date.setHours(0, 0, 0, 0);
+      await this.solarMeterLogsModel.updateOne(
+        { date, projectId },
+        {
+          $set: {
+            date,
+            projectId,
+            createdById: body.createdById,
+            totalProduction: row[1],
+            onPeakProduction: row[2],
+            offPeakProduction: row[3],
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
+  async getSolarMeterLogs(id: string, filter: GetSolarMeterLogsQuery) {
+    // const matchStage: PipelineStage.Match = {};
+    // if ()
+    // const total = await this.solarMeterLogsModel.aggregate([]);
+    // // const logs = await this.solarMeterLogsModel.aggregate<SolarMeterLogsEntity>(
+    // //   [],
+    // // );
   }
 }

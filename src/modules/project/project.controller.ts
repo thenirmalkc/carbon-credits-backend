@@ -16,8 +16,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CreateTverProjectIn,
   GetProjectsQuery,
+  GetSolarMeterLogsQuery,
   UpdatePddTemplateIn,
   UpdateProjectIn,
+  UploadSolarMeterLogsIn,
 } from './project.dto';
 import htmlToDocx from '@turbodocx/html-to-docx';
 import { Response } from 'express';
@@ -137,5 +139,23 @@ export class ProjectController {
       'Content-Length': buffer.length,
     });
     res.end(buffer);
+  }
+
+  @Get(':id/solar-meter-logs')
+  async getSolarMeterLogs(
+    @Param('id') id: string,
+    @Query() filter: GetSolarMeterLogsQuery,
+  ) {
+    await this.projectService.getSolarMeterLogs(id, filter);
+    return true;
+  }
+
+  @Post(':id/upload-solar-meter-logs')
+  async uploadSolarMeterLogs(
+    @Param('id') id: string,
+    @Body() body: UploadSolarMeterLogsIn,
+  ) {
+    await this.projectService.uploadSolarMeterLogs(id, body);
+    return true;
   }
 }

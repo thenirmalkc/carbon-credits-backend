@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsEnum, IsInt, IsNumber, Max, Min } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  Max,
+  Min,
+} from 'class-validator';
 
 export enum SortByEnum {
   CREATED_AT = 'createdAt',
@@ -35,4 +43,38 @@ export class BaseQueryDto {
   )
   @IsNumber()
   order: OrderType;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'date',
+    example: new Date().toISOString().split('T')[0] as unknown as Date,
+  })
+  @Transform(({ value }: { value?: unknown }) => {
+    if (value && typeof value === 'string') {
+      const dateFrom = new Date(value);
+      dateFrom.setHours(0, 0, 0, 0);
+      return dateFrom;
+    }
+    return undefined;
+  })
+  @IsDate()
+  @IsOptional()
+  dateFrom?: Date;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'date',
+    example: new Date().toISOString().split('T')[0] as unknown as Date,
+  })
+  @Transform(({ value }: { value?: unknown }) => {
+    if (value && typeof value === 'string') {
+      const dateTo = new Date(value);
+      dateTo.setHours(23, 59, 59, 999);
+      return dateTo;
+    }
+    return undefined;
+  })
+  @IsDate()
+  @IsOptional()
+  dateTo?: Date;
 }

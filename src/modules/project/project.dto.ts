@@ -2,6 +2,7 @@ import { ApiHideProperty, PartialType, PickType } from '@nestjs/swagger';
 import { ProjectEntity } from './entity/project.entity';
 import { ProjectDocumentsEntity } from './entity/project-document.entity';
 import {
+  Allow,
   IsArray,
   IsEnum,
   IsOptional,
@@ -87,3 +88,14 @@ export class UpdateProjectDocumentIn extends PartialType(
 export class UpdatePddTemplateIn extends PickType(ProjectEntity, [
   'pddTemplate',
 ] as const) {}
+
+export class UploadSolarMeterLogsIn {
+  @IsString()
+  filePath: string;
+
+  @ApiHideProperty()
+  @Allow()
+  createdById: Types.ObjectId;
+}
+
+export class GetSolarMeterLogsQuery extends BaseQueryDto {}

@@ -10,17 +10,23 @@ import {
 } from './entity/project-document.entity';
 import { FileUploadModule } from '../file-upload/file-upload.module';
 import { OpenaiService } from 'src/common/services/openai.service';
+import { MyHttpService } from 'src/common/services/my-http.service';
+import {
+  SolarMeterLogsEntity,
+  SolarMeterLogsSchema,
+} from './entity/solar-meter-logs.entity';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: ProjectEntity.name, schema: ProjectSchema },
       { name: ProjectDocumentsEntity.name, schema: ProjectDocumentsSchema },
+      { name: SolarMeterLogsEntity.name, schema: SolarMeterLogsSchema },
     ]),
     AuthModule,
     FileUploadModule,
   ],
   controllers: [ProjectController],
-  providers: [ProjectService, OpenaiService],
+  providers: [ProjectService, OpenaiService, MyHttpService],
 })
 export class ProjectModule {}
