@@ -374,7 +374,11 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
     if (!rows.length) return;
     const projectId = new Types.ObjectId(id);
     for (const row of rows) {
-      const date = new Date(row[0]);
+      const [dd, mm, yy] = row[0]
+        .trim()
+        .split('-')
+        .map((x) => parseInt(x));
+      const date = new Date(Date.UTC(yy, mm - 1, dd));
       date.setHours(0, 0, 0, 0);
       await this.solarMeterLogsModel.updateOne(
         { date, projectId },
@@ -394,11 +398,29 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
   }
 
   async getSolarMeterLogs(id: string, filter: GetSolarMeterLogsQuery) {
-    // const matchStage: PipelineStage.Match = {};
-    // if ()
-    // const total = await this.solarMeterLogsModel.aggregate([]);
-    // // const logs = await this.solarMeterLogsModel.aggregate<SolarMeterLogsEntity>(
-    // //   [],
-    // // );
+    const matchStage: Record<string, any> = {
+      projectId: new Types.ObjectId(id),
+    };
+    if (filter.dateFrom || filter.dateTo) {
+      const dateFilter: Record<string, any> = {};
+      if (filter.dateFrom) {
+        dateFilter['$gte'] = filter.dateFrom;
+      }
+      if (filter.dateTo) {
+        dateFilter['$lte'] = filter.dateTo;
+      }
+      matchStage['date'] = dateFilter;
+    }
+    console.log(matchStage, 'match stage...');
+    const total = await this.solarMeterLogsModel.aggregate([
+      { $match: matchStage },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+    console.log(total, 'total....');
   }
 }
