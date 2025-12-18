@@ -189,40 +189,34 @@ export class ProjectService {
     if (filter.myUserId) {
       matchStage['createdById'] = filter.myUserId;
     }
-    const result = await this.projectModel.aggregate<ProjectEntity>([
-      {
-        $facet: {
-          total: [{ $match: matchStage }, { $count: 'total' }],
-          items: [
-            { $match: matchStage },
-            { $sort: { [filter.sortBy]: filter.order } },
-            { $skip: filter.offset },
-            { $limit: filter.limit },
-            {
-              $project: {
-                _id: 1,
-                projectType: 1,
-                projectStandard: 1,
-                projectId: 1,
-                projectTitle: 1,
-                carbonCredits: 1,
-                projectOwners: 1,
-                locations: 1,
-                verificationStatus: 1,
-                createdAt: 1,
-              },
-            },
-          ],
-        },
-      },
-      {
-        $addFields: {
-          total: { $ifNull: [{ $arrayElemAt: ['$total.total', 0] }, 0] },
-        },
-      },
-      { $project: { total: 1, items: 1 } },
+    const total = await this.projectModel.aggregate<{ total: number }>([
+      { $match: matchStage },
+      { $count: 'total' },
     ]);
-    return result[0];
+    const items = await this.projectModel.aggregate<ProjectEntity>([
+      { $match: matchStage },
+      { $sort: { [filter.sortBy]: filter.order } },
+      { $skip: filter.offset },
+      { $limit: filter.limit },
+      {
+        $project: {
+          _id: 1,
+          projectType: 1,
+          projectStandard: 1,
+          projectId: 1,
+          projectTitle: 1,
+          carbonCredits: 1,
+          projectOwners: 1,
+          locations: 1,
+          verificationStatus: 1,
+          createdAt: 1,
+        },
+      },
+    ]);
+    return {
+      total: total.length ? total[0].total : 0,
+      items,
+    };
   }
 
   async getPddTemplate(id: string) {
