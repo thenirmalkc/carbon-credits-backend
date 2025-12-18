@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
+  CalculateCarbonCreditsIn,
   CreateTverProjectIn,
   GetProjectsQuery,
   GetSolarMeterLogsQuery,
@@ -141,6 +142,7 @@ export class ProjectController {
     res.end(buffer);
   }
 
+  @BypassAuth()
   @Get(':id/solar-meter-logs')
   async getSolarMeterLogs(
     @Param('id') id: string,
@@ -156,5 +158,14 @@ export class ProjectController {
   ) {
     await this.projectService.uploadSolarMeterLogs(id, body);
     return true;
+  }
+
+  @BypassAuth()
+  @Post(':id/calculate-carbon-credits')
+  calculateCarbonCredits(
+    @Param('id') id: string,
+    @Body() body: CalculateCarbonCreditsIn,
+  ) {
+    return this.projectService.calculateCarbonCredits(id, body);
   }
 }

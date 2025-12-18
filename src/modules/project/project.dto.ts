@@ -5,6 +5,7 @@ import {
   Allow,
   IsArray,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -99,3 +100,11 @@ export class UploadSolarMeterLogsIn {
 }
 
 export class GetSolarMeterLogsQuery extends BaseQueryDto {}
+
+export class CalculateCarbonCreditsIn {
+  @IsNumber()
+  totalProductionKWh: number;
+
+  @IsNumber()
+  emissionFactor: number;
+}

@@ -7,6 +7,7 @@ import {
   ProjectDocumentsEntity,
 } from './entity/project-document.entity';
 import {
+  CalculateCarbonCreditsIn,
   CreateTverProjectIn,
   GetProjectsQuery,
   GetSolarMeterLogsQuery,
@@ -499,6 +500,13 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
       avgProduction,
       total,
       items,
+    };
+  }
+
+  calculateCarbonCredits(id: string, body: CalculateCarbonCreditsIn) {
+    const totalProductionMWh = body.totalProductionKWh / 1000;
+    return {
+      carbonCredits: body.emissionFactor * totalProductionMWh,
     };
   }
 }
