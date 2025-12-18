@@ -492,6 +492,10 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
       ? _totalProduction[0].total
       : 0;
     const avgProduction = totalProduction / total;
+    items.forEach((x) => {
+      x.carbonCredits =
+        (x.totalProduction / 1000) * (filter.emissionFactor || 0);
+    });
 
     return {
       grandTotalProduction,

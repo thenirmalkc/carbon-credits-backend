@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Allow, IsDate, IsNumber } from 'class-validator';
 import { HydratedDocument, Types } from 'mongoose';
 import { CommonBaseEntity } from 'src/common/entities/common-base.entity';
@@ -28,6 +29,9 @@ export class SolarMeterLogsEntity extends CommonBaseEntity {
   @Allow()
   @Prop()
   createdById: Types.ObjectId;
+
+  @ApiHideProperty()
+  carbonCredits: number;
 }
 
 export type SolarMeterLogsDocument = HydratedDocument<SolarMeterLogsEntity>;

@@ -99,7 +99,11 @@ export class UploadSolarMeterLogsIn {
   createdById: Types.ObjectId;
 }
 
-export class GetSolarMeterLogsQuery extends BaseQueryDto {}
+export class GetSolarMeterLogsQuery extends BaseQueryDto {
+  @IsNumber()
+  @IsOptional()
+  emissionFactor?: number = 0;
+}
 
 export class CalculateCarbonCreditsIn {
   @IsNumber()
