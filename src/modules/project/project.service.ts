@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ProjectDocument, ProjectEntity } from './entity/project.entity';
-import { Connection, Model, Types } from 'mongoose';
+import { Connection, Model, PipelineStage, Types } from 'mongoose';
 import {
   ProjectDocumentsDocument,
   ProjectDocumentsEntity,
@@ -95,7 +95,19 @@ export class ProjectService {
     });
   }
 
-  async getProject(id: string) {
+  async getProject(id: string, join: Record<string, true> = {}) {
+    const joinDocuments: PipelineStage[] = [];
+    if (join['documents']) {
+      joinDocuments.push({
+        $lookup: {
+          from: 'project_documents',
+          localField: '_id',
+          foreignField: 'projectId',
+          as: 'documents',
+        },
+      });
+    }
+
     const projects = await this.projectModel.aggregate<ProjectEntity>([
       {
         $match: {
@@ -103,14 +115,7 @@ export class ProjectService {
           deletedAt: { $exists: false },
         },
       },
-      {
-        $lookup: {
-          from: 'project_documents',
-          localField: '_id',
-          foreignField: 'projectId',
-          as: 'documents',
-        },
-      },
+      ...joinDocuments,
       {
         $lookup: {
           from: 'user',
@@ -154,7 +159,9 @@ export class ProjectService {
       },
     ]);
     if (!projects.length) return null;
-    await this.fileUploadService.populateUrls(projects, ['filePath']);
+    if (join['documents']) {
+      await this.fileUploadService.populateUrls(projects, ['filePath']);
+    }
     return projects[0];
   }
 

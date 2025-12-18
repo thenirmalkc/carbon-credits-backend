@@ -64,7 +64,9 @@ export class ProjectController {
   async createTverProject(@Body() body: CreateTverProjectIn) {
     body.standardYear = '2025';
     const projectId = await this.projectService.createTverProject(body);
-    return this.projectService.getProject(projectId.toString());
+    return this.projectService.getProject(projectId.toString(), {
+      documents: true,
+    });
   }
 
   @Put(':id')
@@ -73,11 +75,22 @@ export class ProjectController {
     if (!updated) {
       throw new HttpException('Failed to update', 400);
     }
-    return this.projectService.getProject(id);
+    return this.projectService.getProject(id, { documents: true });
   }
 
   @Get(':id')
   async getProject(@Param('id') id: string) {
+    const project = await this.projectService.getProject(id, {
+      documents: true,
+    });
+    if (!project) {
+      throw new HttpException('Project not found', 404);
+    }
+    return project;
+  }
+
+  @Get(':id/public')
+  async getPublicProject(@Param('id') id: string) {
     const project = await this.projectService.getProject(id);
     if (!project) {
       throw new HttpException('Project not found', 404);
