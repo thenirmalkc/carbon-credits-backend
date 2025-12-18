@@ -189,11 +189,11 @@ export class ProjectService {
     if (filter.myUserId) {
       matchStage['createdById'] = filter.myUserId;
     }
-    const total = await this.projectModel.aggregate<{ total: number }>([
+    const totalP = this.projectModel.aggregate<{ total: number }>([
       { $match: matchStage },
       { $count: 'total' },
     ]);
-    const items = await this.projectModel.aggregate<ProjectEntity>([
+    const itemsP = this.projectModel.aggregate<ProjectEntity>([
       { $match: matchStage },
       { $sort: { [filter.sortBy]: filter.order } },
       { $skip: filter.offset },
@@ -213,6 +213,7 @@ export class ProjectService {
         },
       },
     ]);
+    const [total, items] = await Promise.all([totalP, itemsP]);
     return {
       total: total.length ? total[0].total : 0,
       items,
