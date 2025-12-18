@@ -392,9 +392,8 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
   }
 
   async getSolarMeterLogs(id: string, filter: GetSolarMeterLogsQuery) {
-    const matchStage: Record<string, any> = {
-      projectId: new Types.ObjectId(id),
-    };
+    const projectId = new Types.ObjectId(id);
+    const matchStage: Record<string, any> = { projectId };
     if (filter.dateFrom || filter.dateTo) {
       const dateFilter: Record<string, any> = {};
       if (filter.dateFrom) {
@@ -405,10 +404,13 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
       }
       matchStage['date'] = dateFilter;
     }
-    const total = await this.solarMeterLogsModel.aggregate<{ total: number }>([
+
+    const _total = await this.solarMeterLogsModel.aggregate<{ total: number }>([
       { $match: matchStage },
       { $count: 'total' },
     ]);
+    const total = _total.length ? _total[0].total : 0;
+
     const items =
       await this.solarMeterLogsModel.aggregate<SolarMeterLogsEntity>([
         { $match: matchStage },
@@ -425,8 +427,62 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
           },
         },
       ]);
+
+    // ------------------------- calculation -------------------------
+    const _grandTotalProduction = await this.solarMeterLogsModel.aggregate<{
+      total: number;
+    }>([
+      { $match: { projectId } },
+      {
+        $group: {
+          _id: '$projectId',
+          total: { $sum: '$totalProduction' },
+        },
+      },
+    ]);
+    const grandTotalProduction = _grandTotalProduction.length
+      ? _grandTotalProduction[0].total
+      : 0;
+
+    const _grandAvgProduction = await this.solarMeterLogsModel.aggregate<{
+      total: number;
+    }>([
+      { $match: { projectId } },
+      {
+        $group: {
+          _id: '$projectId',
+          total: { $avg: '$totalProduction' },
+        },
+      },
+    ]);
+    const grandAvgProduction = _grandAvgProduction.length
+      ? _grandAvgProduction[0].total
+      : 0;
+
+    const _totalProduction = await this.solarMeterLogsModel.aggregate<{
+      total: number;
+    }>([
+      { $match: matchStage },
+      {
+        $group: {
+          _id: '$projectId',
+          total: { $sum: '$totalProduction' },
+        },
+      },
+    ]);
+    const totalProduction = _totalProduction.length
+      ? _totalProduction[0].total
+      : 0;
+
+    const avgProduction = totalProduction / total;
+    // xxxxxxxxxxxxxxxxxxxxxxxxx calculation xxxxxxxxxxxxxxxxxxxxxxxxx
+
     return {
-      total: total.length ? total[0].total : 0,
+      grandTotalProduction,
+      grandAvgProduction,
+      totalProduction,
+      avgProduction,
+      total,
       items,
     };
   }
