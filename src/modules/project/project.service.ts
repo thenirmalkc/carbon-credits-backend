@@ -257,9 +257,9 @@ export class ProjectService {
     if (!project) {
       throw new HttpException('Project not found', 404);
     }
-    // wip: generate pdd template
-    // 1 generate pdd template using given data
-    // 2 format pdd template
+    // // wip: generate pdd template
+    // // 1 generate pdd template using given data
+    // // 2 format pdd template
     // const formattedPddTemplate = await this.formatHtmlByAi(this.tverTemplate);
     const formattedPddTemplate = this.tverTemplate;
     await this.projectModel.updateOne(
@@ -267,6 +267,15 @@ export class ProjectService {
       { $set: { pddTemplate: formattedPddTemplate } },
     );
     return { pddTemplate: formattedPddTemplate };
+  }
+
+  async generatePdd(id: string) {
+    const project = await this.getProject(id);
+    if (!project) {
+      throw new HttpException('Project not found', 404);
+    }
+    const systemPrompt = ``;
+    const userPrompt = ``;
   }
 
   async formatHtmlByAi(

@@ -100,6 +100,7 @@ export class UploadSolarMeterLogsIn {
 }
 
 export class GetSolarMeterLogsQuery extends BaseQueryDto {
+  @Type(() => Number)
   @IsNumber()
   @IsOptional()
   emissionFactor?: number = 0;
