@@ -54,6 +54,12 @@ export class ProjectController {
     return this.projectService.getProjects(filter);
   }
 
+  @BypassAuth()
+  @Get('public-projects')
+  getPublicProjects(@Query() filter: GetProjectsQuery) {
+    return this.projectService.getProjects(filter);
+  }
+
   @Post('tver')
   async createTverProject(@Body() body: CreateTverProjectIn) {
     body.standardYear = '2025';
