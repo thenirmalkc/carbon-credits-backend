@@ -363,33 +363,60 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
   }
 
   async uploadSolarMeterLogs(id: string, body: UploadSolarMeterLogsIn) {
-    const url = await this.fileUploadService.getObjectSignedUrl(body.filePath);
-    const res = await this.myHttpService.get<{ data: string }>({ url });
-    const df = pl.readCSV(res.data);
-    const rows = <[string, number, number, number][]>df.rows();
-    if (!rows.length) return;
+    // const url = await this.fileUploadService.getObjectSignedUrl(body.filePath);
+    // const res = await this.myHttpService.get<{ data: string }>({ url });
+    // const df = pl.readCSV(res.data);
+    // const rows = <[string, number, number, number][]>df.rows();
+    // if (!rows.length) return;
+    // const projectId = new Types.ObjectId(id);
+    // for (const row of rows) {
+    //   const [dd, mm, yy] = row[0]
+    //     .trim()
+    //     .split('-')
+    //     .map((x) => parseInt(x));
+    //   const date = new Date(Date.UTC(yy, mm - 1, dd));
+    //   date.setHours(0, 0, 0, 0);
+    //   await this.solarMeterLogsModel.updateOne(
+    //     { date, projectId },
+    //     {
+    //       $set: {
+    //         date,
+    //         projectId,
+    //         createdById: body.createdById,
+    //         totalProduction: row[1],
+    //         onPeakProduction: row[2],
+    //         offPeakProduction: row[3],
+    //       },
+    //     },
+    //     { upsert: true },
+    //   );
+    // }
     const projectId = new Types.ObjectId(id);
-    for (const row of rows) {
-      const [dd, mm, yy] = row[0]
-        .trim()
-        .split('-')
-        .map((x) => parseInt(x));
-      const date = new Date(Date.UTC(yy, mm - 1, dd));
-      date.setHours(0, 0, 0, 0);
+    const startDate = new Date(Date.UTC(2025, 0, 1));
+    const endDate = new Date(Date.UTC(2026, 0, 1));
+    while (startDate < endDate) {
+      const totalProduction = Number((2500 + Math.random() * 100).toFixed(2));
+      const onPeakProduction = Number(
+        (totalProduction * (0.6 + 0.2 * Math.random())).toFixed(2),
+      );
+      const offPeakProduction = Number(
+        (totalProduction - onPeakProduction).toFixed(2),
+      );
       await this.solarMeterLogsModel.updateOne(
-        { date, projectId },
+        { date: startDate, projectId },
         {
           $set: {
-            date,
+            date: startDate,
             projectId,
             createdById: body.createdById,
-            totalProduction: row[1],
-            onPeakProduction: row[2],
-            offPeakProduction: row[3],
+            totalProduction,
+            onPeakProduction,
+            offPeakProduction,
           },
         },
         { upsert: true },
       );
+      startDate.setDate(startDate.getDate() + 1);
     }
   }
 

@@ -1,5 +1,5 @@
 import { Prop, Schema } from '@nestjs/mongoose';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
@@ -138,17 +138,38 @@ export class TverProjectEntity {
   @Prop()
   creditingPeriod: number;
 
-  @Type(() => Date)
+  @Transform(({ value }: { value: unknown }) => {
+    if (value && typeof value === 'string') {
+      const date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    return value;
+  })
   @IsDate()
   @Prop()
   creditingPeriodStart: Date;
 
-  @Type(() => Date)
+  @Transform(({ value }: { value: unknown }) => {
+    if (value && typeof value === 'string') {
+      const date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    return value;
+  })
   @IsDate()
   @Prop()
   creditingPeriodEnd: Date;
 
-  @Type(() => Date)
+  @Transform(({ value }: { value: unknown }) => {
+    if (value && typeof value === 'string') {
+      const date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    return value;
+  })
   @IsDate()
   @Prop()
   finishDate: Date;
