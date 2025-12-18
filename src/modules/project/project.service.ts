@@ -552,16 +552,26 @@ OUTPUT: Return final HTML content with inline CSS applied. No other output is ap
       ? _totalProduction[0].total
       : 0;
     const avgProduction = totalProduction / total;
+    const grandTotalCarbonCredits =
+      (grandTotalProduction / 1000) * filter.emissionFactor;
+    const grandAvgCarbonCredits =
+      (grandAvgProduction / 1000) * filter.emissionFactor;
+    let totalCarbonCredits = 0;
     items.forEach((x) => {
-      x.carbonCredits =
-        (x.totalProduction / 1000) * (filter.emissionFactor || 0);
+      x.carbonCredits = (x.totalProduction / 1000) * filter.emissionFactor;
+      totalCarbonCredits += x.carbonCredits;
     });
+    const avgCarbonCredits = (avgProduction / 1000) * filter.emissionFactor;
 
     return {
-      grandTotalProduction,
-      grandAvgProduction,
-      totalProduction,
-      avgProduction,
+      grandTotalProduction: +grandTotalProduction.toFixed(2),
+      grandAvgProduction: +grandAvgProduction.toFixed(2),
+      totalProduction: +totalProduction.toFixed(2),
+      avgProduction: +avgProduction.toFixed(2),
+      grandTotalCarbonCredits: +grandTotalCarbonCredits.toFixed(2),
+      grandAvgCarbonCredits: +grandAvgCarbonCredits.toFixed(2),
+      totalCarbonCredits: +totalCarbonCredits.toFixed(2),
+      avgCarbonCredits: +avgCarbonCredits.toFixed(2),
       total,
       items,
     };

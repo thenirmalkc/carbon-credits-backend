@@ -1,4 +1,9 @@
-import { ApiHideProperty, PartialType, PickType } from '@nestjs/swagger';
+import {
+  ApiHideProperty,
+  ApiProperty,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { ProjectEntity } from './entity/project.entity';
 import { ProjectDocumentsEntity } from './entity/project-document.entity';
 import {
@@ -100,10 +105,11 @@ export class UploadSolarMeterLogsIn {
 }
 
 export class GetSolarMeterLogsQuery extends BaseQueryDto {
+  @ApiProperty({ required: false })
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  emissionFactor?: number = 0;
+  emissionFactor: number = 0;
 }
 
 export class CalculateCarbonCreditsIn {
