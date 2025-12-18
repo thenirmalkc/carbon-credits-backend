@@ -89,6 +89,7 @@ export class ProjectController {
     return project;
   }
 
+  @BypassAuth()
   @Get(':id/public')
   async getPublicProject(@Param('id') id: string) {
     const project = await this.projectService.getProject(id);
