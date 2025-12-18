@@ -49,6 +49,8 @@ export class FileUploadController {
           file.fileType = FileTypeEnum.IMAGE;
         } else if (file.mimetype === 'application/pdf') {
           file.fileType = FileTypeEnum.PDF;
+        } else if (file.mimetype === 'text/csv') {
+          file.fileType = FileTypeEnum.CSV;
         } else if (
           file.mimetype ===
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -76,7 +78,10 @@ export class FileUploadController {
     @Query() filter: FileUploadQuery,
   ) {
     if (!file) {
-      throw new HttpException('Only image and pdf files are allowed', 400);
+      throw new HttpException(
+        'File type not allowed. Allowed file types are [image, pdf, csv, xlsx] only',
+        400,
+      );
     }
     await this.fileUploadService.transformImage(
       file,
