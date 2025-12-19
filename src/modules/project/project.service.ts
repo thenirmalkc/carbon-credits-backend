@@ -257,6 +257,7 @@ export class ProjectService {
     if (!project) {
       throw new HttpException('Project not found', 404);
     }
+    await new Promise((resolve) => setTimeout(resolve, 1000 * 60)); // timeout for 60 sec
     // // // wip: generate pdd template
     // // // 1 generate pdd template using given data
     // // // 2 format pdd template
